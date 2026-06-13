@@ -31,6 +31,8 @@
     --shadow:   0 14px 40px rgba(0,0,0,.55);
     --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     color-scheme: dark;
+    /* per-glyph dark halo so text pops off the live waveform (thavlik-style) */
+    --halo: 0 0 2px #0b0e12, 0 0 4px #0b0e12, 0 0 4px #0b0e12, 0 0 10px #0b0e12, 0 0 20px #0b0e12, 0 1px 2px #000;
   }
 
   * { box-sizing: border-box; }
@@ -122,7 +124,7 @@
   /* dark vignette so the text reads over the live waveform */
   .hveil {
     position: absolute; inset: 0; z-index: 0; pointer-events: none;
-    background: radial-gradient(80% 74% at 50% 40%, rgba(11,14,18,.58) 0%, rgba(11,14,18,.22) 46%, transparent 76%);
+    background: radial-gradient(70% 64% at 50% 42%, rgba(11,14,18,.3) 0%, transparent 70%);
   }
   .hero > * { position: relative; z-index: 1; }
 
@@ -131,7 +133,7 @@
   .hero .lede { margin-left: auto; margin-right: auto; max-width: 70ch; }
   .hero .proof { justify-content: center; width: 100%; }
 
-  .hailing { margin-top: 2.4rem; display: flex; flex-direction: column; gap: .55rem; align-items: center; font-size: clamp(.95rem, .9rem + .3vw, 1.08rem); color: var(--muted); text-shadow: 0 1px 14px rgba(11,14,18,.85); }
+  .hailing { margin-top: 2.4rem; display: flex; flex-direction: column; gap: .55rem; align-items: center; font-size: clamp(.95rem, .9rem + .3vw, 1.08rem); color: var(--muted); text-shadow: var(--halo); }
   .hailing .k { color: var(--muter); }
   .hailing a { color: var(--accent-2); border-bottom: 1px solid rgba(246,193,119,.4); padding-bottom: 1px; transition: color .15s, border-color .15s; }
   .hailing a:hover { color: #ffd89b; border-bottom-color: rgba(246,193,119,.8); }
@@ -150,13 +152,13 @@
     margin: 0 auto; font-weight: 800;
     font-size: clamp(2.3rem, 1.3rem + 4.6vw, 4.7rem);
     line-height: 1.04; letter-spacing: -0.02em; max-width: 20ch;
-    text-shadow: 0 2px 26px rgba(11,14,18,.92), 0 1px 2px rgba(11,14,18,.9);
+    text-shadow: var(--halo), 0 0 32px rgba(11,14,18,.9);
   }
   h1 .ac { color: var(--accent); }
   h1 .cur { color: var(--accent); animation: blink 1.1s steps(1) infinite; }
   @media (prefers-reduced-motion: reduce) { h1 .cur { animation: none; } }
 
-  .lede { margin: 1.7rem 0 0; max-width: 66ch; color: rgba(243,246,255,.84); font-size: clamp(.98rem, .94rem + .3vw, 1.12rem); line-height: 1.62; text-shadow: 0 1px 3px rgba(11,14,18,.96), 0 0 18px rgba(11,14,18,.85); }
+  .lede { margin: 1.7rem 0 0; max-width: 66ch; color: rgba(243,246,255,.84); font-size: clamp(.98rem, .94rem + .3vw, 1.12rem); line-height: 1.62; text-shadow: var(--halo); }
   .lede b { color: var(--text); font-weight: 600; }
   .lede .hi { color: var(--accent); }
 
@@ -237,6 +239,8 @@
     font-size: .68rem; color: var(--accent); letter-spacing: .02em;
     background: rgba(11,14,18,.85); border: 1px solid rgba(55,166,248,.4); padding: .18rem .5rem;
   }
+  .preview.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border-2); }
+  .preview.duo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   .card-top { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
   .card h3 { margin: 0; font-size: 1.22rem; font-weight: 600; letter-spacing: -0.015em; }
@@ -485,6 +489,30 @@
     </div>
 
     <div class="grid">
+
+      <article class="card rv">
+        <a class="preview duo" href="https://loja.roupadejiu.com/" target="_blank" rel="noopener" aria-label="Visit the Roupa de Jiu store">
+          <img src="assets/rdj-1.webp" loading="lazy" alt="Roupa de Jiu product" />
+          <img src="assets/rdj-2.webp" loading="lazy" alt="Roupa de Jiu product" />
+          <span class="ptag">visit store ↗</span>
+        </a>
+        <div class="card-top">
+          <h3>Roupa de Jiu — the store</h3>
+          <span class="badge">live · my brand</span>
+        </div>
+        <p class="desc">
+          The real <b>Nuvemshop storefront</b> for Roupa de Jiu, my no-gi jiu-jitsu apparel brand. I run the
+          whole thing myself, on my own time: catalogue, pricing, orders, and marketing. I make the creative
+          and the content by hand. Where <b>agentic Claude Code workflows</b> help is the operations around
+          it: planning the content calendar, keeping the posting pipeline moving, and setting up the
+          campaigns on Google Ads and Meta. It lets a one-person brand run like it has a small team behind it.
+        </p>
+        <div class="tags"><span>Nuvemshop</span><span>Claude Code</span><span>Agents</span><span>Google Ads</span><span>Meta Ads</span><span>GA4</span></div>
+        <div class="card-links">
+          <a class="clink" href="https://loja.roupadejiu.com/" target="_blank" rel="noopener">visit store <span class="arr">↗</span></a>
+          <a class="clink" href="https://roupadejiu.com" target="_blank" rel="noopener">brand site <span class="arr">↗</span></a>
+        </div>
+      </article>
 
       <article class="card rv">
         <a class="preview" href="https://leonardo-meireles.github.io/atlas-tatame" target="_blank" rel="noopener" aria-label="Open Atlas Jiu-Jitsu">
