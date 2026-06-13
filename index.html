@@ -367,10 +367,10 @@
       <h1 class="rv">I build the backend that <span class="ac">AI runs on<span class="cur">_</span></span></h1>
       <p class="lede rv">
         I'm a staff engineer at iFood. I built <b>MLGo! Gateway</b>, an ML inference platform in Go that
-        each team deploys as its own plug-and-play instance on AWS EKS. It's the bridge between iFood's apps
-        and the models we serve online, and it's scaling toward dozens of instances across recommendation
-        and <span class="hi">LLM</span> teams. One of the first holds <b>6,000 requests a second under
-        90ms</b>. I also shipped a support agent that cut our on-call load from hours a day to about one.
+        each team deploys on AWS EKS as its own instance. It sits between iFood's apps and the models we
+        serve online, and we're rolling it out to dozens of instances across recommendation and
+        <span class="hi">LLM</span> teams. One of the first holds <b>6,000 requests a second under 90ms</b>.
+        I also shipped a support agent that took our on-call load from hours a day down to about one.
         Off the clock, I take a problem and ship the whole thing, frontend to backend.
       </p>
 
@@ -399,18 +399,18 @@
           <p>
             I'm the lead architect of <b>MLGo! Gateway</b>, a white-label ML inference platform in Go. It
             ships as a Docker image that 10+ data science teams self-deploy on AWS EKS, each running their
-            own instance. It's the middleware between iFood's apps and their already-served SageMaker
-            endpoints: it doesn't serve the model, it orchestrates everything around the call from a
-            YAML-defined DAG, per-request enrichment, multi-stage schema validation, the SageMaker
-            invocation, and response validation. The engine runs enrichment steps in parallel (errgroup with
-            sync.Cond dependency tracking), with read-through caching, background credential refresh, and
-            circuit breakers on every external call. On the ads home, iFood's busiest surface at 50M+ users,
-            one deployment holds <b>6,000 requests a second under 90ms p99 with under 0.1% errors</b> while
-            running nine parallel enrichments and three schema-validation stages per request. I extended it
-            into an <b>OpenAI-compatible gateway</b> for our fine-tuned models, and shipped a
-            <b>LangGraph and Langfuse support agent</b> over a RAG index that took the team's ticket load
-            from three or four hours a day down to about one. I'm also the person here who leans on coding
-            agents the hardest, building the tooling and running the workshops for the rest of engineering.
+            own instance. It sits between iFood's apps and their already-served SageMaker endpoints. It
+            doesn't serve the model; it runs everything around the call from a YAML config: per-request
+            enrichment, schema validation at several stages, the SageMaker invocation, and response
+            validation. The engine fans enrichment steps out in parallel (errgroup with sync.Cond for
+            dependencies), with read-through caching, background credential refresh, and circuit breakers on
+            every external call. On the ads home, iFood's busiest surface at 50M+ users, one deployment holds
+            <b>6,000 requests a second under 90ms p99 with under 0.1% errors</b>, and inside that budget each
+            request runs nine parallel enrichments and three schema-validation stages. I extended it into an
+            OpenAI-compatible gateway for our fine-tuned models, and shipped a LangGraph and Langfuse support
+            agent over a RAG index that took the team's ticket load from three or four hours a day to about
+            one. I'm also the person here who leans on coding agents the hardest, building the tooling and
+            running the workshops for the rest of engineering.
           </p>
         </div>
       </article>
@@ -497,7 +497,7 @@
           <span class="ptag">visit store ↗</span>
         </a>
         <div class="card-top">
-          <h3>Roupa de Jiu — the store</h3>
+          <h3>Roupa de Jiu store</h3>
           <span class="badge">live · my brand</span>
         </div>
         <p class="desc">
