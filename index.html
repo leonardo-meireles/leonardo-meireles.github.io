@@ -243,32 +243,50 @@
   }
   footer a:hover { color: var(--accent); }
 
+  /* ---------- experience: collapsed earlier roles ---------- */
+  .more-xp { margin: 0; }
+  .more-xp > summary {
+    cursor: pointer; list-style: none; color: var(--accent); font-size: .8rem;
+    padding: 1.1rem 0; border-top: 1px solid var(--border-2);
+    display: inline-flex; align-items: center; gap: .5rem; transition: color .15s;
+  }
+  .more-xp > summary::-webkit-details-marker { display: none; }
+  .more-xp > summary::after { content: "▾"; font-size: .7rem; transition: transform .2s ease; }
+  .more-xp[open] > summary { color: var(--muter); }
+  .more-xp[open] > summary::after { transform: rotate(180deg); }
+  .more-xp > summary:hover { color: #74bdff; }
+
   /* ---------- radio ---------- */
   .radio {
     position: fixed; right: clamp(.8rem, 2vw, 1.4rem); bottom: clamp(.8rem, 2vw, 1.4rem); z-index: 60;
-    display: flex; align-items: center; gap: .55rem;
-    background: rgba(12,16,22,.9); backdrop-filter: blur(8px);
-    border: 1px solid var(--border); box-shadow: 0 10px 30px #0008;
-    padding: .5rem .6rem; font-size: .76rem; color: var(--muted);
-    max-width: calc(100vw - 1.6rem);
+    width: min(330px, calc(100vw - 1.6rem));
+    background: rgba(12,16,22,.94); backdrop-filter: blur(10px);
+    border: 1px solid var(--border); box-shadow: 0 14px 38px #000a;
+    font-size: .78rem; color: var(--muted);
   }
-  .radio button {
+  .radio .r-head { display: flex; align-items: center; gap: .6rem; padding: .55rem .65rem; }
+  .radio .r-play {
     font-family: var(--mono); cursor: pointer; color: var(--accent);
-    background: rgba(55,166,248,.1); border: 1px solid rgba(55,166,248,.4);
-    width: 26px; height: 26px; display: grid; place-items: center; padding: 0; flex: none;
+    background: rgba(55,166,248,.12); border: 1px solid rgba(55,166,248,.45);
+    width: 30px; height: 30px; display: grid; place-items: center; padding: 0; flex: none; font-size: .78rem;
     transition: background .15s, border-color .15s;
   }
-  .radio button:hover { background: rgba(55,166,248,.2); border-color: rgba(55,166,248,.7); }
-  .radio .rlabel { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .radio .rlabel b { color: var(--text); font-weight: 400; }
-  .radio .eq { display: inline-flex; gap: 2px; align-items: flex-end; height: 12px; margin-left: .1rem; }
-  .radio .eq i { width: 2px; background: var(--accent); height: 4px; }
+  .radio .r-play:hover { background: rgba(55,166,248,.22); border-color: rgba(55,166,248,.75); }
+  .radio .r-now { min-width: 0; flex: 1; }
+  .radio .r-cap { color: var(--muter); font-size: .68rem; letter-spacing: .03em; }
+  .radio .r-title { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: .4rem; }
+  .radio .eq { display: inline-flex; gap: 2px; align-items: flex-end; height: 11px; flex: none; }
+  .radio .eq i { width: 2px; background: var(--accent); height: 3px; }
   .radio[data-playing="true"] .eq i { animation: eq .9s ease-in-out infinite; }
   .radio .eq i:nth-child(2){ animation-delay: .15s; } .radio .eq i:nth-child(3){ animation-delay: .3s; } .radio .eq i:nth-child(4){ animation-delay: .45s; }
-  @keyframes eq { 0%,100%{ height:3px; } 50%{ height:12px; } }
-  @media (prefers-reduced-motion: reduce) { .radio[data-playing="true"] .eq i { animation: none; height: 7px; } }
-  #ytwrap { position: absolute; width: 0; height: 0; overflow: hidden; left: -9999px; }
-  @media (max-width: 480px) { .radio .rlabel { display: none; } }
+  @keyframes eq { 0%,100%{ height:3px; } 50%{ height:11px; } }
+  @media (prefers-reduced-motion: reduce) { .radio[data-playing="true"] .eq i { animation: none; height: 6px; } }
+  .radio .r-ctl { display: flex; align-items: center; gap: .5rem; padding: 0 .65rem .6rem; }
+  .radio .r-ctl button { font-family: var(--mono); cursor: pointer; color: var(--muted); background: none; border: 0; padding: 2px 4px; font-size: .8rem; }
+  .radio .r-ctl button:hover { color: var(--accent); }
+  .radio .r-vol { flex: 1; accent-color: var(--accent); height: 3px; }
+  .radio .r-volv { color: var(--muter); font-size: .68rem; width: 2.5ch; text-align: right; flex: none; }
+  #ytwrap { position: fixed; left: -9999px; top: 0; width: 320px; height: 180px; overflow: hidden; }
 
   /* ---------- reveal ---------- */
   .rv { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
@@ -374,19 +392,52 @@
       </article>
 
       <article class="role rv">
-        <div class="when"><b>2021 to 2024</b>iFood · Remote</div>
+        <div class="when"><b>2023 to 2024</b>iFood · Remote</div>
         <div>
           <h3>iFood</h3>
-          <p class="tt">Data Scientist, then Senior Data Scientist, Marketing &amp; Fraud</p>
+          <p class="tt">Data Scientist Specialist, Performance Marketing &amp; CRM</p>
           <p>
-            I shipped the order-frequency segmentation model that ended up being marketing's most used,
-            worth about <b>20% more conversions at 10% lower cost</b>. I led the causal-inference automation
-            work that showed roughly R$2M a month in savings, and built unsupervised fraud detection that
-            cut chargebacks <b>15% in its first month</b>. I co-wrote <i>Smart Notifications</i> at
-            WebMedia 2023.
+            I built the order-frequency segmentation model that became the most-used one in marketing,
+            worth about <b>20% more conversions at 10% lower cost</b>. I wrote an internal Python library
+            for uplift modelling that cut the model lifecycle from a month to a week, and ran the deployment
+            and monitoring on PySpark and Airflow, which added up to roughly <b>R$10M a month</b> in
+            efficiency. I also co-wrote <i>Smart Notifications</i> at WebMedia 2023.
           </p>
         </div>
       </article>
+
+      <details class="more-xp">
+        <summary>show earlier roles</summary>
+
+        <article class="role">
+          <div class="when"><b>2022 to 2023</b>iFood · Remote</div>
+          <div>
+            <h3>iFood</h3>
+            <p class="tt">Senior Data Scientist, Performance Marketing &amp; CRM</p>
+            <p>
+              I led an automation push built on causal inference that showed about <b>R$2M a month</b> in
+              potential savings on inactive users, backed by proper A/B testing. I put the targeting models
+              into production myself, serving campaigns to more than <b>60 million customers</b> and taking
+              a lot of manual work out of the loop.
+            </p>
+          </div>
+        </article>
+
+        <article class="role">
+          <div class="when"><b>2021 to 2022</b>iFood · Remote</div>
+          <div>
+            <h3>iFood</h3>
+            <p class="tt">Senior Data Analyst, Fraud Prevention</p>
+            <p>
+              My first role at iFood. I built and shipped unsupervised models and backend rules in Python
+              and PySpark to flag fraudulent accounts, which cut chargebacks <b>15% in the first month</b>.
+              I also built the KPI dashboards that put the loss numbers in front of non-technical
+              stakeholders.
+            </p>
+          </div>
+        </article>
+
+      </details>
     </div>
   </section>
 
@@ -558,10 +609,19 @@
 
 <!-- quiet, optional music radio -->
 <div class="radio" id="radio" data-playing="false" aria-label="Music player">
-  <button id="rbtn" aria-label="Play my music" title="Play (it starts very quiet)">▶</button>
-  <span class="rlabel"><b>leo's radio</b> · my own tracks, low volume
-    <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-  </span>
+  <div class="r-head">
+    <button class="r-play" id="rbtn" aria-label="Play my music" title="Play (starts quiet)">▶</button>
+    <div class="r-now">
+      <div class="r-cap">leo's radio · my own tracks</div>
+      <div class="r-title"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="r-title">press play (warning: not good)</span></div>
+    </div>
+  </div>
+  <div class="r-ctl">
+    <button id="r-prev" aria-label="Previous track" title="Previous">⏮</button>
+    <button id="r-next" aria-label="Next track" title="Next">⏭</button>
+    <input id="r-vol" class="r-vol" type="range" min="0" max="60" value="12" aria-label="Volume" />
+    <span class="r-volv" id="r-volv">12</span>
+  </div>
   <div id="ytwrap"><div id="ytplayer"></div></div>
 </div>
 
@@ -591,11 +651,14 @@
     if (!cv) return;
     const ctx = cv.getContext('2d', { alpha: true });
     const ACCENT = '#37a6f8';
-    const CH = 7;
-    const STEP = 3;
-    const SPEED = 1.05;
+    const LINES = 9;
+    const STEP = 4;
+    const SPEED = 1.0;
+    const LANE = 13;                 // px amplitude of the routed jogs
     let w = 0, h = 0, dpr = 1, t = 0, raf = 0;
-    const seeds = Array.from({ length: CH }, (_, i) => 17.3 + i * 31.7);
+    const seeds = Array.from({ length: LINES }, (_, i) => 11.7 + i * 23.3);
+    const EEG = new Set([3]);        // one bright signal trace
+    const EEG2 = new Set([6]);       // one faint signal trace
 
     function resize() {
       dpr = Math.min(devicePixelRatio || 1, 2);
@@ -605,47 +668,55 @@
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     }
     function hash(n) { const v = Math.sin(n) * 43758.5453; return v - Math.floor(v); }
-    function sample(x, ch, time) {
+    function smooth(a) { return a * a * (3 - 2 * a); }
+    // routed line: long flat runs with smooth rounded jogs between lanes, drifting left
+    function route(x, ch, time) {
+      const s = seeds[ch];
+      const u = x * 0.0042 + time * 0.011 * SPEED;
+      const seg = 1.7, i = Math.floor(u / seg), f = u / seg - i;
+      const lane = (k) => Math.round((hash(k * 1.93 + s) - 0.5) * 4) / 2;
+      const a = lane(i), b = lane(i + 1);
+      const t0 = 0.42, t1 = 0.72;
+      const m = f < t0 ? 0 : f > t1 ? 1 : (f - t0) / (t1 - t0);
+      return (a + (b - a) * smooth(m)) * LANE;
+    }
+    // EEG/ECG-style spike trace
+    function eeg(x, ch, time) {
       const s = seeds[ch];
       const p = x * 0.0085 + time * 0.02 * SPEED;
-      let y = Math.sin(p * 0.8 + s) * 5 + Math.sin(p * 1.9 + s * 1.7) * 2.4;
-      const period = 2.0;
-      const idx = Math.floor(p / period);
-      const fire = hash(idx * 1.7 + s);
+      let y = Math.sin(p * 0.8 + s) * 4 + Math.sin(p * 1.9 + s * 1.7) * 2;
+      const period = 2.0, idx = Math.floor(p / period), fire = hash(idx * 1.7 + s);
       if (fire > 0.55) {
-        const local = (p / period - idx) - 0.5;
-        const amp = (16 + fire * 40);
-        const spike = Math.exp(-Math.pow(local * 16, 2));
-        const dir = (ch % 2 ? -1 : 1);
-        y -= dir * amp * spike;
+        const local = (p / period - idx) - 0.5, amp = 16 + fire * 34, dir = ch % 2 ? -1 : 1;
+        y -= dir * amp * Math.exp(-Math.pow(local * 16, 2));
         y += dir * amp * 0.32 * Math.exp(-Math.pow((local - 0.06) * 22, 2));
       }
       return y;
     }
     function draw() {
       ctx.clearRect(0, 0, w, h);
-      const top = h * 0.13, span = h * 0.74;
-      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      const top = h * 0.12, span = h * 0.76, gap = span / LINES;
+      // faint baselines
+      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.035)';
       ctx.beginPath();
-      for (let ch = 0; ch < CH; ch++) {
-        const yb = top + (ch + 0.5) * (span / CH);
-        ctx.moveTo(0, yb); ctx.lineTo(w, yb);
-      }
+      for (let ch = 0; ch < LINES; ch++) { const yb = top + (ch + 0.5) * gap; ctx.moveTo(0, yb); ctx.lineTo(w, yb); }
       ctx.stroke();
-      for (let ch = 0; ch < CH; ch++) {
-        const yb = top + (ch + 0.5) * (span / CH);
-        const lead = ch === 2;
+      for (let ch = 0; ch < LINES; ch++) {
+        const yb = top + (ch + 0.5) * gap;
+        const isEeg = EEG.has(ch), isEeg2 = EEG2.has(ch);
         ctx.beginPath();
         for (let x = -STEP; x <= w + STEP; x += STEP) {
-          const y = yb + sample(x, ch, t);
+          const off = (isEeg || isEeg2) ? eeg(x, ch, t) : route(x, ch, t);
+          const y = yb + off;
           x === -STEP ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
         }
-        if (lead) {
+        if (isEeg) {
           ctx.strokeStyle = ACCENT; ctx.globalAlpha = 0.9; ctx.lineWidth = 1.7;
           ctx.shadowColor = ACCENT; ctx.shadowBlur = 14;
+        } else if (isEeg2) {
+          ctx.strokeStyle = ACCENT; ctx.globalAlpha = 0.3; ctx.lineWidth = 1.2; ctx.shadowBlur = 0;
         } else {
-          ctx.strokeStyle = ACCENT; ctx.globalAlpha = 0.1 + ch * 0.018; ctx.lineWidth = 1.1;
-          ctx.shadowBlur = 0;
+          ctx.strokeStyle = ACCENT; ctx.globalAlpha = 0.09 + (ch % 3) * 0.02; ctx.lineWidth = 1; ctx.shadowBlur = 0;
         }
         ctx.stroke();
       }
@@ -663,12 +734,16 @@
   // ---- music radio (YouTube IFrame API, low volume, opt-in) ----
   (function () {
     const TRACKS = ['LPpWAUN7wb4', 'E7zQt4Ko_4k', 'bhFlunbmSDU'];
-    const VOL = 12;
     const radio = document.getElementById('radio');
     const btn = document.getElementById('rbtn');
-    let player = null, ready = false, want = false;
-    function loadAPI() {
-      if (window.YT && window.YT.Player) { init(); return; }
+    const titleEl = document.getElementById('r-title');
+    const vol = document.getElementById('r-vol');
+    const volv = document.getElementById('r-volv');
+    const prev = document.getElementById('r-prev');
+    const next = document.getElementById('r-next');
+    let player = null, ready = false, pending = false;
+
+    function load() {
       const tag = document.createElement('script');
       tag.src = 'https://www.youtube.com/iframe_api';
       document.head.appendChild(tag);
@@ -676,26 +751,31 @@
     }
     function init() {
       player = new YT.Player('ytplayer', {
-        height: '0', width: '0',
-        playerVars: { playsinline: 1, controls: 0, disablekb: 1, modestbranding: 1,
+        height: '180', width: '320',
+        playerVars: { playsinline: 1, controls: 0, disablekb: 1, modestbranding: 1, rel: 0,
           playlist: TRACKS.join(','), loop: 1 },
         events: {
-          onReady: () => { ready = true; player.setVolume(VOL); if (want) player.playVideo(); },
+          onReady: () => { ready = true; player.setVolume(Number(vol.value)); if (pending) { player.playVideo(); pending = false; } },
           onStateChange: (e) => {
             const playing = e.data === YT.PlayerState.PLAYING;
             radio.setAttribute('data-playing', String(playing));
             btn.textContent = playing ? '❚❚' : '▶';
             btn.setAttribute('aria-label', playing ? 'Pause music' : 'Play music');
+            const d = player.getVideoData && player.getVideoData();
+            if (d && d.title) titleEl.textContent = d.title;
           }
         }
       });
     }
     btn.addEventListener('click', () => {
-      if (!player) { want = true; btn.textContent = '…'; loadAPI(); return; }
-      const st = player.getPlayerState && player.getPlayerState();
-      if (st === YT.PlayerState.PLAYING) player.pauseVideo();
-      else { player.setVolume(VOL); player.playVideo(); }
+      if (!ready) { pending = true; btn.textContent = '…'; return; }
+      if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
+      else { player.setVolume(Number(vol.value)); player.playVideo(); }
     });
+    prev.addEventListener('click', () => { if (ready) player.previousVideo(); });
+    next.addEventListener('click', () => { if (ready) player.nextVideo(); });
+    vol.addEventListener('input', () => { volv.textContent = vol.value; if (ready) player.setVolume(Number(vol.value)); });
+    load();
   })();
 </script>
 </body>
