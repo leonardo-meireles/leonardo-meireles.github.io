@@ -263,6 +263,23 @@
   .more { margin-top: 1.5rem; color: var(--muter); font-size: .86rem; }
   .more a { color: var(--accent); border-bottom: 1px solid rgba(55,166,248,.35); }
 
+  /* featured project (void) — full-width, above the 2-col grid */
+  .feature {
+    position: relative; border: 1px solid var(--border); border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(55,166,248,.05), transparent 42%), var(--panel);
+    box-shadow: 0 10px 26px #0006; padding: 1.5rem 1.5rem 1.6rem; margin-bottom: 1.6rem;
+    display: flex; flex-direction: column; gap: .7rem;
+    transition: border-color .16s ease, box-shadow .16s ease;
+  }
+  .feature:hover { border-color: rgba(55,166,248,.32); box-shadow: 0 16px 40px #00000088; }
+  .feat-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border-2); border: 1px solid var(--border-2); margin: .4rem 0 .3rem; }
+  .feat-preview .preview { aspect-ratio: 16 / 9; margin: 0; border: 0; }
+  .feat-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-top: .3rem; }
+  .feat-body h4 { margin: 0 0 .35rem; font-size: .78rem; font-weight: 600; color: var(--accent); text-transform: lowercase; letter-spacing: .02em; }
+  .feat-body p.desc { margin: 0; color: #f3f6ffc7; font-size: .95rem; line-height: 1.6; }
+  .feat-body p.desc b { color: var(--text); font-weight: 600; }
+  @media (max-width: 720px) { .feat-preview, .feat-body { grid-template-columns: 1fr; } }
+
   /* ---------- contact ---------- */
   .outro { padding-bottom: clamp(3rem, 6vw, 5rem); text-align: center; display: flex; flex-direction: column; align-items: center; }
   .outro h2 { margin: 0 auto; font-size: clamp(1.8rem, 1.2rem + 3vw, 3.2rem); font-weight: 700; letter-spacing: -0.02em; max-width: 24ch; line-height: 1.08; }
@@ -487,6 +504,54 @@
       <h2>things i build on the side</h2>
       <span class="sub">where the product and front-end side comes out. fast, full-stack, in production.</span>
     </div>
+
+    <!-- featured project: void -->
+    <article class="feature rv">
+      <div class="card-top">
+        <h3>void</h3>
+        <span class="badge os">featured</span>
+        <span class="badge">live</span>
+      </div>
+      <div class="tags"><span>Rust</span><span>WebAssembly</span><span>axum</span><span>WebSocket</span><span>Web Audio</span><span>LLM</span><span>generative</span></div>
+      <div class="feat-preview">
+        <a class="preview" href="https://leonardo-meireles.github.io/void/" target="_blank" rel="noopener" aria-label="Open the void canvas">
+          <iframe class="shot" src="https://leonardo-meireles.github.io/void/" loading="lazy" tabindex="-1" scrolling="no" title="void: the live generative canvas"></iframe>
+          <span class="ptag">live canvas ↗</span>
+        </a>
+        <a class="preview" href="https://leonardo-meireles.github.io/void/#/architecture" target="_blank" rel="noopener" aria-label="Open the void system map">
+          <iframe class="shot" src="https://leonardo-meireles.github.io/void/#/architecture" loading="lazy" tabindex="-1" scrolling="no" title="void: the system architecture map"></iframe>
+          <span class="ptag">system map ↗</span>
+        </a>
+      </div>
+      <div class="feat-body">
+        <div>
+          <h4>what it is</h4>
+          <p class="desc">
+            An infinite generative audiovisual canvas. You type a word, a small language model reads the
+            moment and picks a mood, and Rust generates the art and the music from it. The browser only
+            draws the geometry and sounds the notes. A hand-drawn creature wanders the screen, changes
+            shape, and talks back.
+          </p>
+        </div>
+        <div>
+          <h4>system design</h4>
+          <p class="desc">
+            Rust does the heavy lifting. A Rust crate compiles to WebAssembly and generates everything
+            deterministically from a seed: the visual templates (flow fields, boids, strange attractors,
+            Julia and Mandelbrot sets) and the music (scale-locked, with real modal modulation). A Rust
+            axum server runs the LLM creative director on a <b>Groq free-tier budget</b>, with a
+            pressure-based fallback so it never goes over the limit and never goes silent. TypeScript stays
+            a dumb renderer. The static front end lives on GitHub Pages, always on; the Rust backend runs
+            on Render and only wakes to steer the mood. If it is cold or down, the front end falls back to a
+            local heuristic, so the canvas is always alive.
+          </p>
+        </div>
+      </div>
+      <div class="card-links">
+        <a class="clink" href="https://leonardo-meireles.github.io/void/" target="_blank" rel="noopener">open void <span class="arr">↗</span></a>
+        <a class="clink" href="https://leonardo-meireles.github.io/void/#/architecture" target="_blank" rel="noopener">see the system map <span class="arr">↗</span></a>
+      </div>
+    </article>
 
     <div class="grid">
 
