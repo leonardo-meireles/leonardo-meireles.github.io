@@ -47,6 +47,11 @@
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  /* Lenis smooth scroll */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: hidden; }
 
   body {
     margin: 0;
@@ -839,6 +844,7 @@
   <div id="ytwrap"><div id="ytplayer"></div></div>
 </div>
 
+<script src="https://unpkg.com/lenis@1/dist/lenis.min.js"></script>
 <script>
   // ---- sticky nav border ----
   const nav = document.getElementById('topnav');
@@ -847,6 +853,19 @@
 
   // ---- reveal on scroll ----
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- Lenis smooth scroll (award-site momentum; skip for reduced-motion; graceful if CDN fails) ----
+  if (!reduce && window.Lenis) {
+    const lenis = new Lenis({ duration: 1.05, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
+    (function raf(time){ lenis.raf(time); requestAnimationFrame(raf); })();
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href');
+        if (id.length > 1) { const el = document.querySelector(id); if (el) { e.preventDefault(); lenis.scrollTo(el, { offset: -88 }); } }
+      });
+    });
+  }
+
   const rv = document.querySelectorAll('.rv');
   if (reduce || !('IntersectionObserver' in window)) {
     rv.forEach(el => el.classList.add('in'));
