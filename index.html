@@ -146,6 +146,11 @@
   .hailing .k { color: var(--muter); }
   .hailing a { color: var(--accent-2); border-bottom: 1px solid rgba(246,193,119,.4); padding-bottom: 1px; transition: color .15s, border-color .15s; }
   .hailing a:hover { color: #ffd89b; border-bottom-color: rgba(246,193,119,.8); }
+  .blog-flag { margin-top: 1.8rem; display: inline-flex; align-items: center; gap: .55rem; font-size: .82rem; color: var(--muted); border: 1px solid var(--border); padding: .5rem .9rem; text-shadow: var(--halo); transition: border-color .15s, color .15s; }
+  .blog-flag:hover { border-color: rgba(55,166,248,.5); color: var(--text); }
+  .blog-flag .bf-new { color: var(--accent); border: 1px solid rgba(55,166,248,.4); padding: 0 .4rem; font-size: .7rem; letter-spacing: .04em; }
+  .blog-flag .arr { transition: transform .15s ease; }
+  .blog-flag:hover .arr { transform: translateX(3px); }
 
   .kicker {
     display: inline-flex; align-items: center; gap: .6rem;
@@ -406,6 +411,8 @@
         <span><span class="k">email:</span> <a href="mailto:l.meireles.murtha.oliveira@gmail.com">l.meireles.murtha.oliveira@gmail.com</a></span>
         <span><span class="k">linkedin:</span> <a href="https://www.linkedin.com/in/leo-meireles-murtha" target="_blank" rel="noopener">leo-meireles-murtha</a></span>
       </div>
+
+      <a class="blog-flag rv" href="#blog"><span class="bf-new">new</span> reading: the cleanest design was the wrong one <span class="arr">→</span></a>
     </div>
   </header>
 
@@ -525,11 +532,11 @@
       <div class="tags"><span>Rust</span><span>WebAssembly</span><span>axum</span><span>WebSocket</span><span>Web Audio</span><span>LLM</span><span>generative</span></div>
       <div class="feat-preview">
         <a class="preview" href="https://leonardo-meireles.github.io/void/" target="_blank" rel="noopener" aria-label="Open the void canvas">
-          <iframe class="shot" src="https://leonardo-meireles.github.io/void/" loading="lazy" tabindex="-1" scrolling="no" title="void: the live generative canvas"></iframe>
+          <iframe class="shot" allow="" src="https://leonardo-meireles.github.io/void/" loading="lazy" tabindex="-1" scrolling="no" title="void: the live generative canvas"></iframe>
           <span class="ptag">live canvas ↗</span>
         </a>
         <a class="preview" href="https://leonardo-meireles.github.io/void/#/architecture" target="_blank" rel="noopener" aria-label="Open the void system map">
-          <iframe class="shot" src="https://leonardo-meireles.github.io/void/#/architecture" loading="lazy" tabindex="-1" scrolling="no" title="void: the system architecture map"></iframe>
+          <iframe class="shot" allow="" src="https://leonardo-meireles.github.io/void/#/architecture" loading="lazy" tabindex="-1" scrolling="no" title="void: the system architecture map"></iframe>
           <span class="ptag">system map ↗</span>
         </a>
       </div>
@@ -733,21 +740,34 @@
       <h2>writing</h2>
       <span class="sub">war stories from the platform, and how i actually build with agents.</span>
     </div>
-    <article class="card rv">
-      <div class="card-top">
-        <h3>The cleanest design was the wrong one</h3>
-        <span class="badge">distributed systems</span>
-      </div>
-      <p class="desc">
-        Why I shipped polling over DynamoDB instead of a push-based design for a platform 10+ teams
-        self-deploy, and the hot-partition trap an agent-coding session caught that I'd already waved off.
-      </p>
-      <div class="tags"><span>Go</span><span>DynamoDB</span><span>sharding</span><span>agentic coding</span></div>
-      <div class="card-links">
-        <a class="clink" href="/blog/mlgo-sharding/">read <span class="arr">→</span></a>
-        <a class="clink" href="/blog/">all posts <span class="arr">↗</span></a>
-      </div>
-    </article>
+    <div class="grid">
+      <article class="card rv">
+        <div class="card-top">
+          <h3>The cleanest design was the wrong one</h3>
+          <span class="badge">distributed systems</span>
+        </div>
+        <p class="desc">
+          Why I shipped polling over DynamoDB instead of a push-based design for a platform 10+ teams
+          self-deploy, and the hot-partition trap an agent-coding session caught that I'd already waved off.
+        </p>
+        <div class="tags"><span>Go</span><span>DynamoDB</span><span>sharding</span><span>agentic coding</span></div>
+        <div class="card-links"><a class="clink" href="/blog/mlgo-sharding/">read <span class="arr">→</span></a></div>
+      </article>
+      <article class="card rv">
+        <div class="card-top">
+          <h3>How I make coding with Claude Code fun</h3>
+          <span class="badge">creative coding</span>
+        </div>
+        <p class="desc">
+          I always wanted to build generative art but kept hitting a frontend wall. How music theory,
+          Rust, an LLM, and a loose back-and-forth with an agent became void, a canvas that draws and
+          scores itself.
+        </p>
+        <div class="tags"><span>Rust</span><span>WASM</span><span>Web Audio</span><span>LLM</span><span>generative art</span></div>
+        <div class="card-links"><a class="clink" href="/blog/creative-coding-with-claude-code/">read <span class="arr">→</span></a></div>
+      </article>
+    </div>
+    <p class="more rv">More at <a href="/blog/">all posts</a>.</p>
   </section>
 
   <!-- ABOUT -->
@@ -916,13 +936,18 @@
       }
       ctx.globalAlpha = 1; ctx.shadowBlur = 0;
     }
-    function loop() { t += 1; draw(); raf = requestAnimationFrame(loop); }
+    let running = false;
+    function tick() { t += 1; draw(); raf = requestAnimationFrame(tick); }
+    function start() { if (running || reduce) return; running = true; tick(); }
+    function stop() { running = false; cancelAnimationFrame(raf); }
     resize();
-    addEventListener('resize', () => { cancelAnimationFrame(raf); resize(); reduce ? draw() : loop(); }, { passive: true });
-    reduce ? draw() : loop();
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) cancelAnimationFrame(raf); else if (!reduce) loop();
-    });
+    addEventListener('resize', () => { cancelAnimationFrame(raf); resize(); running ? tick() : (reduce && draw()); }, { passive: true });
+    reduce ? draw() : start();
+    document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
+    // pause the canvas when the hero scrolls off-screen — kills scroll jank
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((es) => { es[0].isIntersecting ? start() : stop(); }, { threshold: 0 }).observe(cv);
+    }
   })();
 
   // ---- music radio (YouTube IFrame API, low volume, opt-in) ----

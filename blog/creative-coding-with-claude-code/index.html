@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How I make coding with Claude Code fun · Leonardo Meireles</title>
+<meta name="description" content="I always wanted to build generative art but a frontend wall stopped me. How I used music theory, Rust, an LLM, and a lot of back-and-forth with Claude Code to build void, an infinite generative audiovisual canvas." />
+<meta property="og:title" content="How I make coding with Claude Code fun and creative" />
+<meta property="og:description" content="Music theory + Rust + an LLM + agentic coding, turned into void: an infinite generative canvas that draws and scores itself." />
+<meta property="og:type" content="article" />
+<link rel="canonical" href="https://leonardo-meireles.github.io/blog/creative-coding-with-claude-code/" />
+<meta property="og:url" content="https://leonardo-meireles.github.io/blog/creative-coding-with-claude-code/" />
+<meta property="og:image" content="https://leonardo-meireles.github.io/assets/og-creative-coding.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://leonardo-meireles.github.io/assets/og-creative-coding.png" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","headline":"How I make coding with Claude Code fun and creative","datePublished":"2026-06-16","author":{"@type":"Person","name":"Leonardo Meireles","url":"https://leonardo-meireles.github.io/"},"image":"https://leonardo-meireles.github.io/assets/og-creative-coding.png","mainEntityOfPage":"https://leonardo-meireles.github.io/blog/creative-coding-with-claude-code/","keywords":["generative art","creative coding","Rust","WebAssembly","Web Audio","LLM","Claude Code","music theory"]}
+</script>
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22&gt;&lt;rect width=%2232%22 height=%2232%22 fill=%22%230b0e12%22/&gt;&lt;path d=%22M3 17h5l2-7 4 13 3-9 2 4h10%22 fill=%22none%22 stroke=%22%2337a6f8%22 stroke-width=%222%22 stroke-linejoin=%22round%22 stroke-linecap=%22round%22/&gt;&lt;/svg&gt;" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#0b0e12; --panel:#0f141b; --panel-2:#0c1016;
+    --border:rgba(222,232,255,.14); --border-2:rgba(222,232,255,.09);
+    --text:rgba(243,246,255,.92); --muted:rgba(243,246,255,.68); --muter:rgba(243,246,255,.52);
+    --accent:#37a6f8; --accent-2:#f6c177; --hot:#ff5b57; --warm:#febc2e; --cool:#28c840;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    color-scheme: dark;
+    --halo: 0 0 1px #000, 0 0 2px #000, 0 0 3px #000, 0 0 4px #000, 0 0 6px #050709, 0 0 12px #050709, 0 0 18px #050709;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+  body { margin:0; min-height:100svh; color:var(--text); font-family:var(--mono); font-size:15px; line-height:1.7;
+    background: linear-gradient(180deg, rgba(55,166,248,.09), transparent 36%), var(--bg); position:relative; isolation:isolate; -webkit-font-smoothing:antialiased; }
+  body::before { content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size:56px 56px; opacity:.35; -webkit-mask-image:radial-gradient(closest-side,#000000bf,#0000 78%); mask-image:radial-gradient(closest-side,#000000bf,#0000 78%); }
+  a { color:inherit; text-decoration:none; }
+  ::selection { background:rgba(55,166,248,.28); color:#fff; }
+  a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  .shell { max-width:46rem; margin:0 auto; padding:0 clamp(1.25rem,4vw,2rem); }
+  .topnav { position:sticky; top:0; z-index:40; background:color-mix(in oklab, var(--bg) 80%, transparent); backdrop-filter:blur(9px) saturate(1.1); border-bottom:1px solid var(--border-2); }
+  .topnav .row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-block:.85rem; max-width:46rem; margin:0 auto; padding-inline:clamp(1.25rem,4vw,2rem); }
+  .dots { display:inline-flex; gap:.42rem; margin-right:.2rem; } .dots i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .dots i:nth-child(1){background:var(--hot);} .dots i:nth-child(2){background:var(--warm);} .dots i:nth-child(3){background:var(--cool);}
+  .brand { display:inline-flex; align-items:center; gap:.7rem; color:var(--muter); font-size:.8rem; } .brand b { color:var(--text); font-weight:400; }
+  .menu { display:flex; gap:1.3rem; } .menu a { color:var(--muter); font-size:.76rem; letter-spacing:.03em; text-transform:lowercase; border-bottom:1px solid transparent; padding-bottom:2px; transition:color .15s, border-color .15s; } .menu a:hover { color:var(--accent); border-color:rgba(55,166,248,.5); }
+  .post-head { padding-top:clamp(2.5rem,7vw,5rem); padding-bottom:1.5rem; }
+  .kicker { display:inline-flex; align-items:center; gap:.55rem; font-size:.74rem; color:var(--accent); letter-spacing:.04em; border:1px solid rgba(55,166,248,.3); background:rgba(55,166,248,.07); padding:.3rem .65rem; margin-bottom:1.4rem; }
+  h1 { font-weight:800; font-size:clamp(1.9rem,1.2rem+3vw,3.1rem); line-height:1.1; letter-spacing:-.02em; margin:0 0 1rem; text-shadow:var(--halo); }
+  .meta { color:var(--muter); font-size:.82rem; letter-spacing:.02em; } .meta .dot { color:var(--border); margin:0 .5rem; }
+  article { padding-bottom:4rem; }
+  article p { color:var(--text); margin:1.1rem 0; }
+  article h2 { font-weight:700; font-size:1.45rem; margin:2.6rem 0 .8rem; letter-spacing:-.01em; }
+  article h2::before { content:"## "; color:var(--accent); }
+  article .lead { font-size:1.08rem; color:var(--muted); }
+  code { background:#00000073; border:1px solid rgba(255,255,255,.15); padding:.1rem .4rem; font-size:.88em; color:#f3f6fff2; }
+  figure { margin:2rem 0; }
+  figure svg { width:100%; height:auto; display:block; background:var(--panel); border:1px solid var(--border); }
+  figcaption { color:var(--muter); font-size:.76rem; margin-top:.55rem; text-align:center; }
+  .d-label { font-family:var(--mono); fill:var(--text); font-size:13px; }
+  .d-mut { fill:var(--muter); font-size:12px; }
+  .d-box { fill:var(--panel-2); stroke:var(--border); }
+  .d-box-acc { fill:rgba(55,166,248,.10); stroke:var(--accent); }
+  .d-box-amb { fill:rgba(246,193,119,.10); stroke:var(--accent-2); }
+  .d-arrow { stroke:var(--accent); stroke-width:1.5; fill:none; }
+  footer { border-top:1px solid var(--border-2); padding:2rem 0 4rem; color:var(--muter); font-size:.82rem; display:flex; gap:1.4rem; flex-wrap:wrap; }
+  footer a { color:var(--accent-2); border-bottom:1px solid rgba(246,193,119,.4); padding-bottom:1px; } footer a:hover { color:#ffd89b; }
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="row">
+    <span class="brand"><span class="dots"><i></i><i></i><i></i></span><span>~/<b>leonardo-meireles</b> · blog</span></span>
+    <nav class="menu"><a href="/">home</a><a href="/blog/">blog</a><a href="https://github.com/leonardo-meireles" target="_blank" rel="noopener">github ↗</a></nav>
+  </div>
+</div>
+
+<main class="shell">
+  <header class="post-head">
+    <span class="kicker">· creative coding</span>
+    <h1>How I make coding with Claude Code fun</h1>
+    <div class="meta">June 16, 2026 <span class="dot">·</span> 8 min read <span class="dot">·</span> the void project</div>
+  </header>
+
+  <article>
+    <p class="lead">For years I wanted to make generative art. The p5.js sketches people post, the ones that feel alive. I never built one, because every time I tried I hit a frontend wall and quit. void is the thing I finally built once that wall stopped mattering, and the reason it stopped mattering is how I now code: a long, loose, creative back-and-forth with an agent.</p>
+
+    <h2>what void is</h2>
+    <p>You type a word. A small language model reads the moment and picks a mood. From that, Rust generates both the visual and the music out of a single seed, and the browser just draws the geometry and plays the notes. A little hand-drawn creature wanders the canvas, changes shape, and occasionally talks back. It is meant to feel like a thing that is alive on its own, not a thing you operate.</p>
+    <p>The split is deliberate. A Rust crate compiles to WebAssembly and does the heavy generation. TypeScript stays a dumb renderer. A small Rust axum server runs the LLM "creative director" on a Groq free-tier budget, and when that budget is spent or the server is cold, the front end falls back to a local heuristic so the canvas never freezes and never goes silent.</p>
+
+    <figure>
+      <svg viewBox="0 0 720 250" role="img" aria-label="A typed word goes to a small LLM that picks a mood; a seed drives a Rust/WASM generator that produces both art and music from the same seed; the browser draws and sounds it; a budget-aware fallback keeps it alive when the LLM is unavailable.">
+        <rect x="20" y="104" width="120" height="42" class="d-box-acc"/><text x="80" y="129" text-anchor="middle" class="d-label">your word</text>
+        <path d="M142 125 L196 125" class="d-arrow" marker-end="url(#a)"/>
+        <rect x="198" y="98" width="150" height="54" class="d-box-acc"/><text x="273" y="120" text-anchor="middle" class="d-label">small LLM</text><text x="273" y="138" text-anchor="middle" class="d-mut">picks a mood</text>
+        <path d="M348 125 L404 125" class="d-arrow" marker-end="url(#a)"/>
+        <rect x="406" y="98" width="150" height="54" class="d-box-amb"/><text x="481" y="120" text-anchor="middle" class="d-label">Rust / WASM</text><text x="481" y="138" text-anchor="middle" class="d-mut">one seed</text>
+        <path d="M556 112 C600 96, 612 70, 636 64" class="d-arrow" marker-end="url(#a)"/>
+        <path d="M556 138 C600 154, 612 180, 636 186" class="d-arrow" marker-end="url(#a)"/>
+        <rect x="600" y="44" width="100" height="40" class="d-box"/><text x="650" y="69" text-anchor="middle" class="d-mut">art</text>
+        <rect x="600" y="166" width="100" height="40" class="d-box"/><text x="650" y="191" text-anchor="middle" class="d-mut">music</text>
+        <rect x="198" y="196" width="358" height="34" class="d-box"/><text x="377" y="217" text-anchor="middle" class="d-mut">no LLM? budget-aware local-heuristic fallback (never goes silent)</text>
+        <path d="M273 152 L300 194" class="d-arrow" stroke-dasharray="4 4" marker-end="url(#a)"/>
+        <defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#37a6f8"/></marker></defs>
+      </svg>
+      <figcaption>Word, mood, one seed, two outputs. The fallback is what lets it run forever on a free tier.</figcaption>
+    </figure>
+
+    <h2>the music came first, really</h2>
+    <p>I produce music in Ableton and I get lost in the theory side of it. void was an excuse to pour that into code. The generator does not play random notes. It is scale-locked, with real modal modulation, euclidean drum patterns, a walking bass, a Markov melody line, and voice-leading between chords. Later I added stranger things: a melody lane driven by a Rule-110 cellular automaton, and a canon voice that sings a delayed inversion of the main line. That is music theory I already had in my head, finally doing something.</p>
+    <p>The art side grew the same way, one template at a time: truchet tiles, voronoi, phyllotaxis, superformula curves, Lorenz and Thomas strange attractors, chladni cymatics, reaction-diffusion. The commit history is just me adding one generator, listening and looking, then adding another.</p>
+
+    <h2>the part I'm proudest of: they share a seed</h2>
+    <p>The art and the music are not two systems running side by side. They come from the same seed and they talk to each other. Tempo paces the hue cycle and the canvas breathing. The brightness of the musical scale tilts the color palette warm or cool. Pick a darker mood and the whole thing, sound and image, leans with it. Getting that coupling to feel intentional instead of coincidental was the hard, fun part, and it is the thing that makes void read as one living object.</p>
+
+    <figure>
+      <svg viewBox="0 0 720 150" role="img" aria-label="A shared seed feeds both art and music; tempo paces the hue cycle and the musical scale's brightness tilts the color palette, so the two stay coupled.">
+        <rect x="290" y="20" width="140" height="40" class="d-box-amb"/><text x="360" y="45" text-anchor="middle" class="d-label">shared seed</text>
+        <path d="M300 60 C220 80, 180 88, 150 96" class="d-arrow" marker-end="url(#b)"/>
+        <path d="M420 60 C500 80, 540 88, 570 96" class="d-arrow" marker-end="url(#b)"/>
+        <rect x="40" y="98" width="200" height="38" class="d-box"/><text x="140" y="122" text-anchor="middle" class="d-mut">art (hue, breathing)</text>
+        <rect x="480" y="98" width="200" height="38" class="d-box"/><text x="580" y="122" text-anchor="middle" class="d-mut">music (tempo, scale)</text>
+        <path d="M240 117 L478 117" class="d-arrow" stroke-dasharray="5 4" marker-start="url(#b)" marker-end="url(#b)"/>
+        <text x="360" y="110" text-anchor="middle" class="d-mut">tempo paces hue · scale tilts palette</text>
+        <defs><marker id="b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#37a6f8"/></marker></defs>
+      </svg>
+      <figcaption>One seed, coupled outputs. The sound bends the picture and the picture follows the sound.</figcaption>
+    </figure>
+
+    <h2>learning Rust by making it</h2>
+    <p>I did not learn Rust and then build void. I built void and learned Rust on the way. The heavy generation lives in the WASM crate, and a lot of the later commits are me going back and making it more idiomatic, running clippy, moving the field spec to a single source of truth in Rust so the TypeScript side could not drift from it. That is the kind of cleanup I would normally skip on a side project. With an agent in the loop it was cheap enough to actually do, so the code got better instead of rotting.</p>
+
+    <h2>how I actually work with the agent</h2>
+    <p>Here is the honest part. Most of these features did not come from a plan. They came from a loose conversation. I would say "make the background feel more alive" and we would go back and forth until the frame roamed and the colors drifted. I would say "the buddy should evolve where you can see it" and we would widen the window so the level-ups actually happen on screen. The commit messages give it away: half of them say things like "creative musical improvements", "polish and delight", "self-heal". That is not how I write commit messages at work. That is what it looks like when coding is play.</p>
+    <p>The agent is not writing the song for me. It removes the friction between an idea and seeing it run. For someone who always bounced off the frontend, that is the whole game. The thing I could picture but never ship, I can ship now, because the distance from "what if it did this" to "it does this" got short enough to stay in the creative flow instead of falling out of it to fight a build error.</p>
+
+    <h2>why this matters to me</h2>
+    <p>void is not going to pay rent and it is not trying to. It is the proof, mostly to myself, that the wall I always blamed was never really about talent or taste. It was friction. Take the friction out and the generative-art itch I had carried for years just becomes a thing I build on a weekend, for fun, and keep adding to because I want to see what it does next.</p>
+    <p>It is live at <a href="https://leonardo-meireles.github.io/void/" style="color:var(--accent-2);border-bottom:1px solid rgba(246,193,119,.4)">leonardo-meireles.github.io/void</a>. Type a word and see what mood it picks.</p>
+  </article>
+
+  <footer>
+    <a href="/blog/">← all posts</a>
+    <a href="/">leonardo-meireles.github.io</a>
+    <a href="https://github.com/leonardo-meireles" target="_blank" rel="noopener">github</a>
+  </footer>
+</main>
+
+</body>
+</html>
