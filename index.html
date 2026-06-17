@@ -4,11 +4,20 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Leonardo Meireles, Backend &amp; AI Engineer</title>
-<meta name="description" content="Backend and ML-platform engineer at iFood. I built the inference gateway that serves our models at 6,000 req/s under 90ms, the OpenAI-compatible layer they run behind, and the agents on top." />
+<meta name="description" content="Senior software engineer at iFood on the AI Platform team. I built the inference gateway that serves our models at 6,000 req/s under 90ms, the OpenAI-compatible layer they run behind, and the agents on top." />
+<link rel="canonical" href="https://leonardo-meireles.github.io/" />
 <meta property="og:title" content="Leonardo Meireles, Backend & AI Engineer" />
 <meta property="og:description" content="I build the backend that AI runs on. An inference gateway at 6,000 req/s, an OpenAI-compatible model layer, and the agents on top of it." />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://leonardo-meireles.github.io" />
+<meta property="og:url" content="https://leonardo-meireles.github.io/" />
+<meta property="og:image" content="https://leonardo-meireles.github.io/assets/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://leonardo-meireles.github.io/assets/og.png" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Leonardo Meireles","url":"https://leonardo-meireles.github.io/","jobTitle":"Senior Software Engineer","worksFor":{"@type":"Organization","name":"iFood"},"address":{"@type":"PostalAddress","addressCountry":"BR"},"sameAs":["https://www.linkedin.com/in/leo-meireles-murtha/","https://github.com/leonardo-meireles"],"knowsAbout":["Backend engineering","Distributed systems","AI platforms","LLM agents","RAG","Go","Python","AWS"]}
+</script>
 <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22&gt;&lt;rect width=%2232%22 height=%2232%22 fill=%22%230b0e12%22/&gt;&lt;path d=%22M3 17h5l2-7 4 13 3-9 2 4h10%22 fill=%22none%22 stroke=%22%2337a6f8%22 stroke-width=%222%22 stroke-linejoin=%22round%22 stroke-linecap=%22round%22/&gt;&lt;/svg&gt;" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -368,6 +377,7 @@
       <a href="#experience">experience</a>
       <a href="#work">projects</a>
       <a href="#about">about</a>
+      <a href="/blog/">blog</a>
       <a href="#contact">contact</a>
       <a class="gh" href="https://github.com/leonardo-meireles" target="_blank" rel="noopener">github ↗</a>
     </nav>
@@ -716,10 +726,34 @@
     <p class="more rv">There's more on <a href="https://github.com/leonardo-meireles?tab=repositories" target="_blank" rel="noopener">github</a>, including a few ML case studies.</p>
   </section>
 
+  <!-- WRITING -->
+  <section id="blog" class="shell">
+    <div class="sec-head rv">
+      <span class="no">03</span>
+      <h2>writing</h2>
+      <span class="sub">war stories from the platform, and how i actually build with agents.</span>
+    </div>
+    <article class="card rv">
+      <div class="card-top">
+        <h3>The cleanest design was the wrong one</h3>
+        <span class="badge">distributed systems</span>
+      </div>
+      <p class="desc">
+        Why I shipped polling over DynamoDB instead of a push-based design for a platform 10+ teams
+        self-deploy, and the hot-partition trap an agent-coding session caught that I'd already waved off.
+      </p>
+      <div class="tags"><span>Go</span><span>DynamoDB</span><span>sharding</span><span>agentic coding</span></div>
+      <div class="card-links">
+        <a class="clink" href="/blog/mlgo-sharding/">read <span class="arr">→</span></a>
+        <a class="clink" href="/blog/">all posts <span class="arr">↗</span></a>
+      </div>
+    </article>
+  </section>
+
   <!-- ABOUT -->
   <section id="about" class="shell">
     <div class="sec-head rv">
-      <span class="no">03</span>
+      <span class="no">04</span>
       <h2>off the keyboard</h2>
       <span class="sub">the parts that don't show up in a commit history.</span>
     </div>
