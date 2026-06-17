@@ -4,10 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Leonardo Meireles, Backend &amp; AI Engineer</title>
-<meta name="description" content="Senior software engineer at iFood on the AI Platform team. I built the inference gateway that serves our models at 6,000 req/s under 90ms, the OpenAI-compatible layer they run behind, and the agents on top." />
+<meta name="description" content="Senior software engineer at iFood on the AI Platform team. I built an internal inference platform that serves our models at 6,000+ req/s under 100ms, the OpenAI-compatible layer they run behind, and the agents on top." />
 <link rel="canonical" href="https://leonardo-meireles.github.io/" />
 <meta property="og:title" content="Leonardo Meireles, Backend & AI Engineer" />
-<meta property="og:description" content="I build the backend that AI runs on. An inference gateway at 6,000 req/s, an OpenAI-compatible model layer, and the agents on top of it." />
+<meta property="og:description" content="I build the backend that AI runs on. An internal inference platform at 6,000+ req/s, an OpenAI-compatible model layer, and the agents on top of it." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://leonardo-meireles.github.io/" />
 <meta property="og:image" content="https://leonardo-meireles.github.io/assets/og.png" />
@@ -403,10 +403,10 @@
       <span class="kicker rv"><span class="blink"></span> senior software engineer · ifood · ai platform &amp; agents</span>
       <h1 class="rv">I build the backend that <span class="ac">AI runs on<span class="cur">_</span></span></h1>
       <p class="lede rv">
-        I'm a senior engineer at iFood. I built <b>MLGo! Gateway</b>, an ML inference platform in Go that
+        I'm a senior engineer at iFood. I built <b>an internal ML inference platform</b> in Go that
         each team deploys on AWS EKS as its own instance. It sits between iFood's apps and the models we
         serve online, and we're rolling it out to dozens of instances across recommendation and
-        <span class="hi">LLM</span> teams. One of the first holds <b>6,000 requests a second under 90ms</b>.
+        <span class="hi">LLM</span> teams. One of the first handles <b>6,000+ requests a second, well under 100ms</b>.
         I also shipped a support agent that took our on-call load from hours a day down to about one.
         Off the clock, I take a problem and ship the whole thing, frontend to backend.
       </p>
@@ -436,15 +436,15 @@
           <h3>iFood</h3>
           <p class="tt">Senior Software Engineer · AI Platform / Backend</p>
           <p>
-            I'm the lead architect of <b>MLGo! Gateway</b>, a white-label ML inference platform in Go. It
+            I'm the lead architect of an <b>internal, white-label ML inference platform</b> in Go. It
             ships as a Docker image that 10+ data science teams self-deploy on AWS EKS, each running their
-            own instance. It sits between iFood's apps and their already-served SageMaker endpoints. It
+            own instance. It sits between the apps and their already-served SageMaker endpoints. It
             doesn't serve the model; it runs everything around the call from a YAML config: per-request
-            enrichment, schema validation at several stages, the SageMaker invocation, and response
+            enrichment, schema validation at several stages, the model invocation, and response
             validation. The engine fans enrichment steps out in parallel (errgroup with sync.Cond for
             dependencies), with read-through caching, background credential refresh, and circuit breakers on
-            every external call. On the ads home, iFood's busiest surface at 50M+ users, one deployment holds
-            <b>6,000 requests a second under 90ms p99 with under 0.1% errors</b>, and inside that budget each
+            every external call. On a high-traffic surface (50M+ users), one deployment handles
+            <b>6,000+ requests a second, well under 100ms</b>, and inside that budget each
             request runs nine parallel enrichments and three schema-validation stages. I extended it into an
             OpenAI-compatible gateway for our fine-tuned models, and shipped a LangGraph and Langfuse support
             agent over a RAG index that took the team's ticket load from three or four hours a day to about
