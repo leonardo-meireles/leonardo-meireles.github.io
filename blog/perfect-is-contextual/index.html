@@ -4,19 +4,19 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>The cleanest design was the wrong one · Leonardo Meireles</title>
-<meta name="description" content="A sharding story from iFood's ML platform: why I shipped polling over DynamoDB instead of a push-based design, and how an agent-coding session caught the worst case I'd waved off." />
+<meta name="description" content="A sharding story: why I shipped polling over a push-based design for a platform many teams self-deploy, and the cold-start hot-partition trap an agent-coding session caught that I'd waved off." />
 <meta property="og:title" content="The cleanest design was the wrong one" />
-<meta property="og:description" content="Why the textbook-elegant design was the wrong call for a platform 10+ teams self-deploy, and the hot-partition trap I almost shipped." />
+<meta property="og:description" content="Why the textbook-elegant design was the wrong call for a platform many teams self-deploy, and the hot-partition trap I almost shipped." />
 <meta property="og:type" content="article" />
-<link rel="canonical" href="https://leonardo-meireles.github.io/blog/mlgo-sharding/" />
-<meta property="og:url" content="https://leonardo-meireles.github.io/blog/mlgo-sharding/" />
-<meta property="og:image" content="https://leonardo-meireles.github.io/assets/og-mlgo-sharding.png" />
+<link rel="canonical" href="https://leonardo-meireles.github.io/blog/perfect-is-contextual/" />
+<meta property="og:url" content="https://leonardo-meireles.github.io/blog/perfect-is-contextual/" />
+<meta property="og:image" content="https://leonardo-meireles.github.io/assets/og-perfect-is-contextual.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://leonardo-meireles.github.io/assets/og-mlgo-sharding.png" />
+<meta name="twitter:image" content="https://leonardo-meireles.github.io/assets/og-perfect-is-contextual.png" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","headline":"The cleanest design was the wrong one","datePublished":"2026-06-16","author":{"@type":"Person","name":"Leonardo Meireles","url":"https://leonardo-meireles.github.io/"},"image":"https://leonardo-meireles.github.io/assets/og-mlgo-sharding.png","mainEntityOfPage":"https://leonardo-meireles.github.io/blog/mlgo-sharding/","keywords":["distributed systems","DynamoDB","sharding","Go","agentic coding","platform engineering"]}
+{"@context":"https://schema.org","@type":"BlogPosting","headline":"The cleanest design was the wrong one","datePublished":"2026-06-16","author":{"@type":"Person","name":"Leonardo Meireles","url":"https://leonardo-meireles.github.io/"},"image":"https://leonardo-meireles.github.io/assets/og-perfect-is-contextual.png","mainEntityOfPage":"https://leonardo-meireles.github.io/blog/perfect-is-contextual/","keywords":["distributed systems","sharding","platform engineering","hot partition","agentic coding"]}
 </script>
 <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22&gt;&lt;rect width=%2232%22 height=%2232%22 fill=%22%230b0e12%22/&gt;&lt;path d=%22M3 17h5l2-7 4 13 3-9 2 4h10%22 fill=%22none%22 stroke=%22%2337a6f8%22 stroke-width=%222%22 stroke-linejoin=%22round%22 stroke-linecap=%22round%22/&gt;&lt;/svg&gt;" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,57 +35,31 @@
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
   @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
-  body {
-    margin:0; min-height:100svh; color:var(--text); font-family:var(--mono);
-    font-size:15px; line-height:1.7;
-    background: linear-gradient(180deg, rgba(55,166,248,.09), transparent 36%), var(--bg);
-    position:relative; isolation:isolate; -webkit-font-smoothing:antialiased;
-  }
-  body::before {
-    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  body { margin:0; min-height:100svh; color:var(--text); font-family:var(--mono); font-size:15px; line-height:1.7;
+    background: linear-gradient(180deg, rgba(55,166,248,.09), transparent 36%), var(--bg); position:relative; isolation:isolate; -webkit-font-smoothing:antialiased; }
+  body::before { content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
     background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-    background-size:56px 56px; opacity:.35;
-    -webkit-mask-image: radial-gradient(closest-side, #000000bf, #0000 78%);
-    mask-image: radial-gradient(closest-side, #000000bf, #0000 78%);
-  }
+    background-size:56px 56px; opacity:.35; -webkit-mask-image:radial-gradient(closest-side,#000000bf,#0000 78%); mask-image:radial-gradient(closest-side,#000000bf,#0000 78%); }
   a { color:inherit; text-decoration:none; }
   ::selection { background:rgba(55,166,248,.28); color:#fff; }
   a:focus-visible, summary:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
-
   .shell { max-width:46rem; margin:0 auto; padding:0 clamp(1.25rem,4vw,2rem); }
-
-  /* nav */
   .topnav { position:sticky; top:0; z-index:40; background:color-mix(in oklab, var(--bg) 80%, transparent); backdrop-filter:blur(9px) saturate(1.1); border-bottom:1px solid var(--border-2); }
   .topnav .row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-block:.85rem; max-width:46rem; margin:0 auto; padding-inline:clamp(1.25rem,4vw,2rem); }
-  .dots { display:inline-flex; gap:.42rem; margin-right:.2rem; }
-  .dots i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .dots { display:inline-flex; gap:.42rem; margin-right:.2rem; } .dots i { width:11px; height:11px; border-radius:50%; display:inline-block; }
   .dots i:nth-child(1){background:var(--hot);} .dots i:nth-child(2){background:var(--warm);} .dots i:nth-child(3){background:var(--cool);}
-  .brand { display:inline-flex; align-items:center; gap:.7rem; color:var(--muter); font-size:.8rem; }
-  .brand b { color:var(--text); font-weight:400; }
-  .menu { display:flex; gap:1.3rem; }
-  .menu a { color:var(--muter); font-size:.76rem; letter-spacing:.03em; text-transform:lowercase; border-bottom:1px solid transparent; padding-bottom:2px; transition:color .15s, border-color .15s; }
-  .menu a:hover { color:var(--accent); border-color:rgba(55,166,248,.5); }
-
-  /* header */
+  .brand { display:inline-flex; align-items:center; gap:.7rem; color:var(--muter); font-size:.8rem; } .brand b { color:var(--text); font-weight:400; }
+  .menu { display:flex; gap:1.3rem; } .menu a { color:var(--muter); font-size:.76rem; letter-spacing:.03em; text-transform:lowercase; border-bottom:1px solid transparent; padding-bottom:2px; transition:color .15s, border-color .15s; } .menu a:hover { color:var(--accent); border-color:rgba(55,166,248,.5); }
   .post-head { padding-top:clamp(2.5rem,7vw,5rem); padding-bottom:1.5rem; }
   .kicker { display:inline-flex; align-items:center; gap:.55rem; font-size:.74rem; color:var(--accent); letter-spacing:.04em; border:1px solid rgba(55,166,248,.3); background:rgba(55,166,248,.07); padding:.3rem .65rem; margin-bottom:1.4rem; }
   h1 { font-weight:800; font-size:clamp(1.9rem,1.2rem+3vw,3.1rem); line-height:1.1; letter-spacing:-.02em; margin:0 0 1rem; text-shadow:var(--halo); }
-  .meta { color:var(--muter); font-size:.82rem; letter-spacing:.02em; }
-  .meta .dot { color:var(--border); margin:0 .5rem; }
-
-  /* body */
+  .meta { color:var(--muter); font-size:.82rem; letter-spacing:.02em; } .meta .dot { color:var(--border); margin:0 .5rem; }
   article { padding-bottom:4rem; }
   article p { color:var(--text); margin:1.1rem 0; }
   article h2 { font-weight:700; font-size:1.45rem; margin:2.6rem 0 .8rem; letter-spacing:-.01em; }
   article h2::before { content:"## "; color:var(--accent); }
-  article strong, article b { font-weight:700; }
   article .lead { font-size:1.08rem; color:var(--muted); }
-  blockquote { margin:1.6rem 0; padding:.6rem 0 .6rem 1.1rem; border-left:2px solid var(--accent); color:var(--muted); font-style:normal; }
   code { background:#00000073; border:1px solid rgba(255,255,255,.15); padding:.1rem .4rem; font-size:.88em; color:#f3f6fff2; }
-  pre { background:var(--panel-2); border:1px solid var(--border); padding:1rem 1.1rem; overflow-x:auto; font-size:.84rem; line-height:1.6; margin:1.4rem 0; }
-  pre code { background:none; border:none; padding:0; color:var(--text); }
-
-  /* figures / diagrams */
   figure { margin:2rem 0; }
   figure svg { width:100%; height:auto; display:block; background:var(--panel); border:1px solid var(--border); }
   figcaption { color:var(--muter); font-size:.76rem; margin-top:.55rem; text-align:center; }
@@ -94,14 +68,11 @@
   .d-box { fill:var(--panel-2); stroke:var(--border); }
   .d-box-acc { fill:rgba(55,166,248,.10); stroke:var(--accent); }
   .d-box-hot { fill:rgba(255,91,87,.10); stroke:var(--hot); }
-  .d-box-cool { fill:rgba(40,200,64,.10); stroke:var(--cool); }
   .d-faint { opacity:.45; }
   .d-arrow { stroke:var(--accent); stroke-width:1.5; fill:none; }
   .d-arrow-mut { stroke:var(--muter); stroke-width:1.2; fill:none; opacity:.5; }
-
   footer { border-top:1px solid var(--border-2); padding:2rem 0 4rem; color:var(--muter); font-size:.82rem; display:flex; gap:1.4rem; flex-wrap:wrap; }
-  footer a { color:var(--accent-2); border-bottom:1px solid rgba(246,193,119,.4); padding-bottom:1px; }
-  footer a:hover { color:#ffd89b; }
+  footer a { color:var(--accent-2); border-bottom:1px solid rgba(246,193,119,.4); padding-bottom:1px; } footer a:hover { color:#ffd89b; }
 </style>
 </head>
 <body>
@@ -121,24 +92,24 @@
   <header class="post-head">
     <span class="kicker">· distributed systems</span>
     <h1>The cleanest design was the wrong one</h1>
-    <div class="meta">June 16, 2026 <span class="dot">·</span> 7 min read <span class="dot">·</span> iFood AI Platform</div>
+    <div class="meta">June 16, 2026 <span class="dot">·</span> 7 min read <span class="dot">·</span> backend</div>
   </header>
 
   <article>
-    <p class="lead">I almost shipped the textbook design. It was clean, push-based, and it would have made every team that adopted my platform a little more miserable. Here is why I threw it out, what I shipped instead, and the failure mode an agent-coding session caught that I had already waved off.</p>
+    <p class="lead">I almost shipped the textbook design. It was clean, push-based, and it would have made every team that adopted my platform a little more miserable. Here is why I threw it out, what I shipped instead, and the failure mode an agent-coding session caught that I had already waved off. The details below are generalized on purpose, but the lesson is exactly as it happened.</p>
 
     <h2>the setup</h2>
-    <p>I work on MLGo! Gateway, a Go ML inference platform at iFood. It is not one service. It ships as a container image, and 10+ data science teams each deploy their own instance on AWS EKS, usually several pods behind a load balancer. The gateway sits in front of a team's already-served SageMaker endpoint and runs everything around the call: per-request enrichment, schema validation, the model invocation.</p>
-    <p>One feature: a team can promote a new DAG version as the default for a DAG name. The catch is how that promote lands. It is a single POST, so it hits exactly one pod. Every other pod in that deployment is now serving the old default until it finds out. They all have to converge, fast, without anyone restarting anything.</p>
+    <p>The thing I work on is an internal platform that other teams self-deploy. It is not one shared service. It ships as a container image, and each team runs its own instance behind a load balancer, usually several pods. The platform sits in front of a model endpoint and does the work around the call: per-request enrichment, validation, the invocation.</p>
+    <p>One feature: a team can change which config version is the live default. The catch is how that change lands. It arrives as a single request, so it hits exactly one pod. Every other pod in that deployment is still serving the old default until it finds out. They all have to converge, fast, without anyone restarting anything.</p>
 
     <figure>
-      <svg viewBox="0 0 720 220" role="img" aria-label="A promote POST hits one pod; the other pods in the deployment still serve the old default and must converge.">
+      <svg viewBox="0 0 720 220" role="img" aria-label="A change request hits one pod; the other pods in the deployment still serve the old default and must converge.">
         <rect x="24" y="92" width="120" height="40" class="d-box-acc"/>
-        <text x="84" y="116" text-anchor="middle" class="d-label">promote</text>
+        <text x="84" y="116" text-anchor="middle" class="d-label">change</text>
         <path d="M148 112 L208 112" class="d-arrow" marker-end="url(#ah)"/>
         <rect x="212" y="92" width="150" height="40" class="d-box-acc"/>
         <text x="287" y="111" text-anchor="middle" class="d-label">pod A</text>
-        <text x="287" y="126" text-anchor="middle" class="d-mut">got the POST</text>
+        <text x="287" y="126" text-anchor="middle" class="d-mut">got the request</text>
         <rect x="430" y="22" width="150" height="38" class="d-box d-faint"/>
         <text x="505" y="46" text-anchor="middle" class="d-label d-faint">pod B · stale</text>
         <rect x="430" y="92" width="150" height="38" class="d-box d-faint"/>
@@ -154,26 +125,26 @@
           <marker id="ahm" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="rgba(243,246,255,.4)"/></marker>
         </defs>
       </svg>
-      <figcaption>One POST, one pod. The rest of the deployment is stale until it converges.</figcaption>
+      <figcaption>One request, one pod. The rest of the deployment is stale until it converges.</figcaption>
     </figure>
 
     <h2>the design I almost shipped</h2>
     <p>The obvious answer is push. Put the change on a message bus, fan it out, every pod reacts in milliseconds. SQS, Kafka, Redis pub/sub. I have built that before and it works.</p>
-    <p>Then I remembered who deploys this thing. Not me. 10+ teams, each running their own instance, most of them data scientists who want to ship a model and not babysit a broker. A push design means every one of those teams has to provision the bus, get it approved, wire up the IAM, and operate it forever. I would be exporting my elegance as their ops cost, multiplied by every team that adopts the platform. That is the opposite of what a platform is supposed to do.</p>
+    <p>Then I remembered who deploys this thing. Not me. A lot of teams, each running their own instance, most of them not interested in babysitting a broker. A push design means every one of those teams has to provision the bus, get it approved, wire up the access, and operate it forever. I would be exporting my elegance as their ops cost, multiplied by every team that adopts the platform. That is the opposite of what a platform is supposed to do.</p>
 
     <figure>
-      <svg viewBox="0 0 720 230" role="img" aria-label="Push-based design needs a new message bus that every adopting team must provision and operate. Poll-based design reuses the DynamoDB table teams already have.">
+      <svg viewBox="0 0 720 230" role="img" aria-label="Push-based design needs a new message bus that every adopting team must provision and operate. Poll-based design reuses a store the teams already run.">
         <rect x="20" y="20" width="330" height="190" class="d-box-hot"/>
         <text x="40" y="48" class="d-label">push (Kafka / SQS / Redis)</text>
         <rect x="48" y="70" width="120" height="34" class="d-box"/><text x="108" y="92" text-anchor="middle" class="d-mut">message bus</text>
         <rect x="200" y="70" width="120" height="34" class="d-box"/><text x="260" y="92" text-anchor="middle" class="d-mut">pods react</text>
         <text x="40" y="140" class="d-mut">+ every team provisions it</text>
-        <text x="40" y="160" class="d-mut">+ approvals, IAM, on-call</text>
-        <text x="40" y="186" style="fill:#ff5b57" class="d-mut">cost paid by all 10+ teams</text>
+        <text x="40" y="160" class="d-mut">+ approvals, access, on-call</text>
+        <text x="40" y="186" style="fill:#ff5b57" class="d-mut">cost paid by every adopting team</text>
 
-        <rect x="370" y="20" width="330" height="190" class="d-box-cool"/>
-        <text x="390" y="48" class="d-label">poll + DynamoDB</text>
-        <rect x="398" y="70" width="130" height="34" class="d-box"/><text x="463" y="92" text-anchor="middle" class="d-mut">DynamoDB (already a dep)</text>
+        <rect x="370" y="20" width="330" height="190" class="d-box"/>
+        <text x="390" y="48" class="d-label">poll a store they already run</text>
+        <rect x="398" y="70" width="130" height="34" class="d-box"/><text x="463" y="92" text-anchor="middle" class="d-mut">key-value store (already a dep)</text>
         <rect x="560" y="70" width="115" height="34" class="d-box"/><text x="617" y="92" text-anchor="middle" class="d-mut">pods poll</text>
         <text x="390" y="140" class="d-mut">+ no new infra to adopt</text>
         <text x="390" y="160" class="d-mut">+ converges in one poll cycle</text>
@@ -182,31 +153,31 @@
       <figcaption>Same goal, very different bill. The right design optimizes for the constraint that actually slows the org down: per-team infra.</figcaption>
     </figure>
 
-    <p>So I shipped the boring version. Pods poll a DynamoDB table (which every instance already depends on) for the current default, with an in-memory cache so the read is cheap and the steady state is quiet. A promote writes the new default; within one poll cycle every pod has it. No broker, nothing new for any team to run. Slightly less instant than push, completely invisible to the people adopting the platform.</p>
+    <p>So I shipped the boring version. Pods poll a key-value store they already depend on for the current default, with an in-memory cache so the read is cheap and the steady state is quiet. A change writes the new default; within one poll cycle every pod has it. No broker, nothing new for any team to run. Slightly less instant than push, completely invisible to the people adopting the platform.</p>
 
     <h2>the trap the agent caught</h2>
     <p>I had a working design and I was happy with it. Before calling it done I ran it through Claude Code as a red-team, asking it to break the thing under load. It kept pushing a case I had mentally filed under "won't happen": a cold start at scale.</p>
-    <p>Horizontal autoscaling does not bring pods up gently. A traffic spike spins up 200 pods, and something like 70% of them initialize in the same instant. Every one of them does its first read against the same single item, on the same partition key, at the same time. A single refresh shard plus a 60-second poll turns startup into a thundering herd straight onto one DynamoDB partition. Hot partition, throttling, exactly when you are trying to scale up.</p>
+    <p>Autoscaling does not bring pods up gently. A traffic spike spins up a lot of pods at once, and a big chunk of them initialize in the same instant. Every one of them does its first read against the same key, on the same partition, at the same time. A single refresh shard plus a poll on the order of a minute turns startup into a thundering herd onto one partition. Hot partition, throttling, exactly when you are trying to scale up.</p>
     <p>I had waved this off because steady-state polling is trivial. The agent did not care about steady state. It cared about the worst second of the day, which is the second that pages you.</p>
 
     <figure>
-      <svg viewBox="0 0 720 240" role="img" aria-label="200 pods hitting one shard cause a hot partition and throttling. Spreading the same sync id across 8 read shards plus startup jitter spreads the load.">
+      <svg viewBox="0 0 720 240" role="img" aria-label="Many pods hitting one shard cause a hot partition and throttling. Spreading the same value across several read shards plus startup jitter spreads the load.">
         <text x="40" y="34" class="d-label" style="fill:#ff5b57">before · 1 shard</text>
         <g>
           <rect x="20" y="50" width="150" height="150" class="d-box d-faint"/>
-          <text x="95" y="74" text-anchor="middle" class="d-mut">200 pods, cold start</text>
+          <text x="95" y="74" text-anchor="middle" class="d-mut">many pods, cold start</text>
           <path d="M95 84 L250 120" class="d-arrow" style="stroke:#ff5b57"/>
           <path d="M95 110 L250 122" class="d-arrow" style="stroke:#ff5b57"/>
           <path d="M95 140 L250 124" class="d-arrow" style="stroke:#ff5b57"/>
           <path d="M95 170 L250 126" class="d-arrow" style="stroke:#ff5b57"/>
           <rect x="252" y="104" width="86" height="40" class="d-box-hot"/>
-          <text x="295" y="122" text-anchor="middle" class="d-label">shard 0</text>
+          <text x="295" y="122" text-anchor="middle" class="d-label">one shard</text>
           <text x="295" y="136" text-anchor="middle" class="d-mut" style="fill:#ff5b57">throttle</text>
         </g>
         <line x1="372" y1="40" x2="372" y2="210" stroke="rgba(222,232,255,.14)"/>
-        <text x="396" y="34" class="d-label" style="fill:#28c840">after · 8 shards + jitter</text>
+        <text x="396" y="34" class="d-label" style="fill:#28c840">after · N shards + jitter</text>
         <rect x="396" y="50" width="150" height="150" class="d-box d-faint"/>
-        <text x="471" y="74" text-anchor="middle" class="d-mut">same 200, jittered</text>
+        <text x="471" y="74" text-anchor="middle" class="d-mut">same pods, jittered</text>
         <g class="d-arrow" style="stroke:#37a6f8">
           <path d="M471 90 L612 70"/><path d="M471 110 L612 100"/><path d="M471 130 L612 130"/>
           <path d="M471 150 L612 160"/><path d="M471 170 L612 190"/>
@@ -214,19 +185,17 @@
         <rect x="614" y="58" width="86" height="22" class="d-box-acc"/><text x="657" y="73" text-anchor="middle" class="d-mut">shard 1</text>
         <rect x="614" y="90" width="86" height="22" class="d-box-acc"/><text x="657" y="105" text-anchor="middle" class="d-mut">shard 2</text>
         <rect x="614" y="122" width="86" height="22" class="d-box-acc"/><text x="657" y="137" text-anchor="middle" class="d-mut">…</text>
-        <rect x="614" y="154" width="86" height="22" class="d-box-acc"/><text x="657" y="169" text-anchor="middle" class="d-mut">shard 7</text>
-        <rect x="614" y="186" width="86" height="22" class="d-box-acc"/><text x="657" y="201" text-anchor="middle" class="d-mut">shard 8</text>
+        <rect x="614" y="154" width="86" height="22" class="d-box-acc"/><text x="657" y="169" text-anchor="middle" class="d-mut">shard N</text>
       </svg>
-      <figcaption>Same sync id written to 8 read shards, pods pick one at random, plus startup jitter. The herd spreads across partitions instead of stampeding one.</figcaption>
+      <figcaption>The same value written to several read shards, pods pick one at random, plus startup jitter. The herd spreads across partitions instead of stampeding one.</figcaption>
     </figure>
 
-    <p>The fix was small. The same sync value gets written to 8 read shards. Each pod reads from a randomly chosen shard, and I added jitter to the startup poll so the 200 pods do not line up on the same tick. The herd spreads across partitions and across time. Same boring polling design, now it survives the worst second.</p>
+    <p>The fix was small. The same value gets written to a handful of read shards. Each pod reads from a randomly chosen shard, and I added jitter to the startup poll so the pods do not line up on the same tick. The herd spreads across partitions and across time. Same boring polling design, now it survives the worst second.</p>
 
     <h2>what I actually took from it</h2>
     <p>Two things.</p>
     <p>First, perfect is contextual. The push design was better in a vacuum and worse in mine. The constraint that actually slowed the org down was not propagation latency, it was per-team infra. Optimizing for the wrong constraint gives you a clean design nobody wants to adopt. I now ask "who pays for this, and how many of them are there" before I ask "what is the elegant version".</p>
-    <p>Second, agents are good at the case you have already dismissed. I did not use Claude Code to write the sharding code. I used it to argue with me about the part I was sure about, and it found the 200-pod cold start I had filed under "won't happen". That is the part of agentic coding I actually rely on: not the typing, the adversarial second opinion on my own confidence.</p>
-    <p>The whole thing shipped in one two-week sprint. (Unrelated trivia: there is a separate write-sharding fix I did for a DynamoDB hot partition during dinner peak. Different incident, same lesson, also mine.)</p>
+    <p>Second, agents are good at the case you have already dismissed. I did not use Claude Code to write the sharding code. I used it to argue with me about the part I was sure about, and it found the cold-start stampede I had filed under "won't happen". That is the part of agentic coding I actually rely on: not the typing, the adversarial second opinion on my own confidence.</p>
   </article>
 
   <footer>
