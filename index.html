@@ -243,6 +243,17 @@
     position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden;
     border: 1px solid var(--border-2); background: var(--panel-2); margin-bottom: .5rem;
   }
+  /* paused state: the empty iframe is hidden so this ▶ poster shows; a mounted frame covers it */
+  .preview .shot:not([src]) { visibility: hidden; }
+  .preview::before {
+    content: "\25B6"; position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+    width: 2.6rem; height: 2.6rem; display: grid; place-items: center; padding-left: .18rem;
+    border: 1px solid var(--border); border-radius: 50%;
+    background: color-mix(in oklab, var(--bg) 72%, transparent);
+    color: var(--muter); font-size: .82rem; transition: color .16s ease, border-color .16s ease;
+  }
+  .preview:hover::before { color: var(--accent); border-color: rgba(55,166,248,.5); }
+  .preview.duo::before { content: none; }
   .preview .shot {
     position: absolute; inset: 0; width: 250%; height: 250%; border: 0;
     transform: scale(.4); transform-origin: 0 0; pointer-events: none; background: #0b0e12;
@@ -537,11 +548,11 @@
       <div class="tags"><span>Rust</span><span>WebAssembly</span><span>axum</span><span>WebSocket</span><span>Web Audio</span><span>LLM</span><span>generative</span></div>
       <div class="feat-preview">
         <a class="preview" href="https://leonardo-meireles.github.io/void/" target="_blank" rel="noopener" aria-label="Open the void canvas">
-          <iframe class="shot" allow="" src="https://leonardo-meireles.github.io/void/" loading="lazy" tabindex="-1" scrolling="no" title="void: the live generative canvas"></iframe>
+          <iframe class="shot" allow="" data-src="https://leonardo-meireles.github.io/void/" tabindex="-1" scrolling="no" title="void: the live generative canvas"></iframe>
           <span class="ptag">live canvas ↗</span>
         </a>
         <a class="preview" href="https://leonardo-meireles.github.io/void/#/architecture" target="_blank" rel="noopener" aria-label="Open the void system map">
-          <iframe class="shot" allow="" src="https://leonardo-meireles.github.io/void/#/architecture" loading="lazy" tabindex="-1" scrolling="no" title="void: the system architecture map"></iframe>
+          <iframe class="shot" allow="" data-src="https://leonardo-meireles.github.io/void/#/architecture" tabindex="-1" scrolling="no" title="void: the system architecture map"></iframe>
           <span class="ptag">system map ↗</span>
         </a>
       </div>
@@ -579,7 +590,7 @@
 
       <article class="card rv">
         <a class="preview" href="https://leonardo-meireles.github.io/Random-Acess-Memory-Neural-Network/" target="_blank" rel="noopener" aria-label="Open the playdoom demo">
-          <iframe class="shot" src="https://leonardo-meireles.github.io/Random-Acess-Memory-Neural-Network/" loading="lazy" tabindex="-1" scrolling="no" title="playdoom: a RAM neural network learning Doom"></iframe>
+          <iframe class="shot" data-src="https://leonardo-meireles.github.io/Random-Acess-Memory-Neural-Network/" tabindex="-1" scrolling="no" title="playdoom: a RAM neural network learning Doom"></iframe>
           <span class="ptag">live preview ↗</span>
         </a>
         <div class="card-top">
@@ -628,7 +639,7 @@
 
       <article class="card rv">
         <a class="preview" href="https://leonardo-meireles.github.io/atlas-tatame" target="_blank" rel="noopener" aria-label="Open Atlas Jiu-Jitsu">
-          <iframe class="shot" src="https://leonardo-meireles.github.io/atlas-tatame" loading="lazy" tabindex="-1" scrolling="no" title="Atlas Jiu-Jitsu preview"></iframe>
+          <iframe class="shot" data-src="https://leonardo-meireles.github.io/atlas-tatame" tabindex="-1" scrolling="no" title="Atlas Jiu-Jitsu preview"></iframe>
           <span class="ptag">live preview ↗</span>
         </a>
         <div class="card-top">
@@ -653,7 +664,7 @@
 
       <article class="card rv">
         <a class="preview" href="https://leonardo-meireles.github.io/curador-ia-solutions/" target="_blank" rel="noopener" aria-label="Open Curador.ia">
-          <iframe class="shot" src="https://leonardo-meireles.github.io/curador-ia-solutions/" loading="lazy" tabindex="-1" scrolling="no" title="Curador.ia preview"></iframe>
+          <iframe class="shot" data-src="https://leonardo-meireles.github.io/curador-ia-solutions/" tabindex="-1" scrolling="no" title="Curador.ia preview"></iframe>
           <span class="ptag">live preview ↗</span>
         </a>
         <div class="card-top">
@@ -677,7 +688,7 @@
 
       <article class="card rv">
         <a class="preview" href="https://leonardo-meireles.github.io/roupa-de-jiu-landing-page/" target="_blank" rel="noopener" aria-label="Open Roupa de Jiu">
-          <iframe class="shot" src="https://leonardo-meireles.github.io/roupa-de-jiu-landing-page/" loading="lazy" tabindex="-1" scrolling="no" title="Roupa de Jiu preview"></iframe>
+          <iframe class="shot" data-src="https://leonardo-meireles.github.io/roupa-de-jiu-landing-page/" tabindex="-1" scrolling="no" title="Roupa de Jiu preview"></iframe>
           <span class="ptag">live preview ↗</span>
         </a>
         <div class="card-top">
@@ -894,7 +905,7 @@
     const EEG2 = new Set([1, 7]);    // medium signal traces
 
     function resize() {
-      dpr = Math.min(devicePixelRatio || 1, 2);
+      dpr = Math.min(devicePixelRatio || 1, 1.5);
       w = cv.clientWidth; h = cv.clientHeight;
       cv.width = Math.floor(w * dpr); cv.height = Math.floor(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -943,17 +954,18 @@
           const y = yb + off;
           x === -STEP ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
         }
+        ctx.strokeStyle = ACCENT;
         if (isEeg) {
-          ctx.strokeStyle = ACCENT; ctx.globalAlpha = 0.85; ctx.lineWidth = 1.6;
-          ctx.shadowColor = ACCENT; ctx.shadowBlur = 12;
+          // cheap glow: wide faint underlay + crisp top stroke (no per-frame shadowBlur)
+          ctx.globalAlpha = 0.16; ctx.lineWidth = 5;   ctx.stroke();
+          ctx.globalAlpha = 0.9;  ctx.lineWidth = 1.6; ctx.stroke();
         } else if (isEeg2) {
-          ctx.strokeStyle = ACCENT; ctx.globalAlpha = 0.42; ctx.lineWidth = 1.2; ctx.shadowBlur = 0;
+          ctx.globalAlpha = 0.42; ctx.lineWidth = 1.2; ctx.stroke();
         } else {
-          ctx.strokeStyle = ACCENT; ctx.globalAlpha = 0.18 + (ch % 3) * 0.03; ctx.lineWidth = 1; ctx.shadowBlur = 0;
+          ctx.globalAlpha = 0.18 + (ch % 3) * 0.03; ctx.lineWidth = 1; ctx.stroke();
         }
-        ctx.stroke();
       }
-      ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
     }
     let running = false;
     function tick() { t += 1; draw(); raf = requestAnimationFrame(tick); }
@@ -979,7 +991,7 @@
     const volv = document.getElementById('r-volv');
     const prev = document.getElementById('r-prev');
     const next = document.getElementById('r-next');
-    let player = null, ready = false, pending = false;
+    let player = null, ready = false, pending = false, loadStarted = false;
 
     function load() {
       const tag = document.createElement('script');
@@ -1006,6 +1018,8 @@
       });
     }
     btn.addEventListener('click', () => {
+      // defer the whole YouTube API + hidden iframe until the first play click
+      if (!loadStarted) { loadStarted = true; pending = true; btn.textContent = '…'; load(); return; }
       if (!ready) { pending = true; btn.textContent = '…'; return; }
       if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
       else { player.setVolume(Number(vol.value)); player.playVideo(); }
@@ -1013,7 +1027,34 @@
     prev.addEventListener('click', () => { if (ready) player.previousVideo(); });
     next.addEventListener('click', () => { if (ready) player.nextVideo(); });
     vol.addEventListener('input', () => { volv.textContent = vol.value; if (ready) player.setVolume(Number(vol.value)); });
-    load();
+  })();
+
+  // ---- live previews: at most ONE runs at a time, and only after scrolling settles ----
+  // each preview is a heavy cross-origin SPA (Rust/WASM, Three.js, React) rendered as a big scaled
+  // compositor layer. running several — or booting one mid-scroll — is what janks the page (esp. the
+  // two void frames). so: while you scroll, nothing boots (buttery); when you pause, the single
+  // most-centered preview wakes; everything else unmounts.
+  (function () {
+    const frames = [...document.querySelectorAll('iframe.shot')];
+    if (!frames.length) return;
+    let current = null, t = 0;
+    const mount = f => { if (f && !f.getAttribute('src') && f.dataset.src) f.setAttribute('src', f.dataset.src); };
+    const unmount = f => { if (f && f.getAttribute('src')) { f.dataset.src = f.getAttribute('src'); f.removeAttribute('src'); } };
+    function pick() {
+      const vh = innerHeight, cy = vh / 2;
+      let best = null, bestD = Infinity;
+      for (const f of frames) {
+        const r = f.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) continue;              // off-screen
+        const d = Math.abs((r.top + r.bottom) / 2 - cy);       // distance from viewport center
+        if (d < bestD) { bestD = d; best = f; }
+      }
+      if (best !== current) { unmount(current); current = best; mount(current); }
+    }
+    const settle = () => { clearTimeout(t); t = setTimeout(pick, 180); };  // wake after scroll stops
+    addEventListener('scroll', settle, { passive: true });
+    addEventListener('resize', settle, { passive: true });
+    settle();
   })();
 </script>
 </body>
