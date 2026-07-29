@@ -462,6 +462,18 @@
             one. I'm also the person here who leans on coding agents the hardest, building the tooling and
             running the workshops for the rest of engineering.
           </p>
+          <p>
+            More recently I've been building the V2 of BESH, our batch-inference platform for LCM (iFood's
+            own generative model) and a dozen other internal LLMs. V1 shared inference across models; V2 is
+            a distributed rewrite where every model gets its own set of workers and GPUs, so one noisy job
+            can't starve another. It now runs <b>100M+ requests a week</b>. I moved worker scaling onto KEDA
+            so the fleet sits near zero between runs, and rebuilt GPU autoscaling after learning the obvious
+            metric, KV-cache usage, doesn't actually predict load for this workload. The fix that mattered
+            most was a backpressure loop that discovers how much a model can take instead of being told,
+            built on the same idea as TCP congestion control. I also traced a full-fleet outage back to
+            Kubernetes quietly evicting a warm pod mid-run, not our code, and closed that gap with disruption
+            budgets and canary rollouts.
+          </p>
         </div>
       </article>
 
