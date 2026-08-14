@@ -428,7 +428,7 @@
         <span><span class="k">linkedin:</span> <a href="https://www.linkedin.com/in/leo-meireles-murtha" target="_blank" rel="noopener">leo-meireles-murtha</a></span>
       </div>
 
-      <a class="blog-flag rv" href="#blog"><span class="bf-new">new</span> reading: the cleanest design was the wrong one <span class="arr">→</span></a>
+      <a class="blog-flag rv" href="/blog/laeleficator/"><span class="bf-new">new</span> reading: my model still doesn't get the joke <span class="arr">→</span></a>
     </div>
   </header>
 
@@ -626,6 +626,26 @@
       </article>
 
       <article class="card rv">
+        <div class="card-top">
+          <h3>Laeleficator</h3>
+          <span class="badge os">open source</span>
+        </div>
+        <p class="desc">
+          A fine-tuned Qwen2.5 model that rewrites innocent Brazilian Portuguese into phrases that carry
+          <i>lá ele</i>, the reflexive double-entendre defence from Bahian slang. Parallel Claude subagents
+          scrape, vet, pair, and adversarially judge every training pair, with zero manual review, then an
+          agent research loop trains and evaluates one hyperparameter change at a time on <code>MLX-LM</code>,
+          local on my M1 Max. Best result so far clears a strict three-judge panel on <b>17.6%</b> of
+          held-out cases. Still an open problem, not a shipped product.
+        </p>
+        <div class="tags"><span>Python</span><span>Qwen2.5</span><span>MLX-LM</span><span>LoRA</span><span>Claude Agents</span><span>PT-BR</span></div>
+        <div class="card-links">
+          <a class="clink" href="https://github.com/leonardo-meireles/laeleficator" target="_blank" rel="noopener">source <span class="arr">↗</span></a>
+          <a class="clink" href="/blog/laeleficator/">read the writeup <span class="arr">→</span></a>
+        </div>
+      </article>
+
+      <article class="card rv">
         <a class="preview duo" href="https://loja.roupadejiu.com/" target="_blank" rel="noopener" aria-label="Visit the Roupa de Jiu store">
           <img src="assets/rdj-1.webp" loading="lazy" alt="Roupa de Jiu product" />
           <img src="assets/rdj-2.webp" loading="lazy" alt="Roupa de Jiu product" />
@@ -769,6 +789,18 @@
       <span class="sub">war stories from the platform, and how i actually build with agents.</span>
     </div>
     <div class="grid">
+      <article class="card rv">
+        <div class="card-top">
+          <h3>My model still doesn't get the joke</h3>
+          <span class="badge">fine-tuning</span>
+        </div>
+        <p class="desc">
+          Agents curate the dataset, agents run the research loop, and the model still fails a strict
+          judge panel most of the time. Notes from the honest, unglamorous middle of a fine-tune.
+        </p>
+        <div class="tags"><span>Qwen2.5</span><span>MLX-LM</span><span>LoRA</span><span>agentic coding</span></div>
+        <div class="card-links"><a class="clink" href="/blog/laeleficator/">read <span class="arr">→</span></a></div>
+      </article>
       <article class="card rv">
         <div class="card-top">
           <h3>The cleanest design was the wrong one</h3>

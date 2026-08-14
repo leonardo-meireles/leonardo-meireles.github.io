@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My model still doesn't get the joke · Leonardo Meireles</title>
+<meta name="description" content="Laeleficator fine-tunes a small model to write Brazilian double entendres. Agents curate the dataset and run the research loop. The model still fails a strict judge panel most of the time, and that's the honest story." />
+<meta property="og:title" content="My model still doesn't get the joke" />
+<meta property="og:description" content="Agents curate the dataset, agents run the research loop, and the model still fails a strict judge panel most of the time. Notes from a small PT-BR fine-tune running for free on a laptop." />
+<meta property="og:type" content="article" />
+<link rel="canonical" href="https://leonardo-meireles.github.io/blog/laeleficator/" />
+<meta property="og:url" content="https://leonardo-meireles.github.io/blog/laeleficator/" />
+<meta name="twitter:card" content="summary" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","headline":"My model still doesn't get the joke","datePublished":"2026-08-14","author":{"@type":"Person","name":"Leonardo Meireles","url":"https://leonardo-meireles.github.io/"},"mainEntityOfPage":"https://leonardo-meireles.github.io/blog/laeleficator/","keywords":["fine-tuning","LoRA","MLX","Qwen2.5","LLM-as-judge","PT-BR","agentic coding"]}
+</script>
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22&gt;&lt;rect width=%2232%22 height=%2232%22 fill=%22%230b0e12%22/&gt;&lt;path d=%22M3 17h5l2-7 4 13 3-9 2 4h10%22 fill=%22none%22 stroke=%22%2337a6f8%22 stroke-width=%222%22 stroke-linejoin=%22round%22 stroke-linecap=%22round%22/&gt;&lt;/svg&gt;" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#0b0e12; --panel:#0f141b; --panel-2:#0c1016;
+    --border:rgba(222,232,255,.14); --border-2:rgba(222,232,255,.09);
+    --text:rgba(243,246,255,.92); --muted:rgba(243,246,255,.68); --muter:rgba(243,246,255,.52);
+    --accent:#37a6f8; --accent-2:#f6c177; --hot:#ff5b57; --warm:#febc2e; --cool:#28c840;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    color-scheme: dark;
+    --halo: 0 0 1px #000, 0 0 2px #000, 0 0 3px #000, 0 0 4px #000, 0 0 6px #050709, 0 0 12px #050709, 0 0 18px #050709;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+  body { margin:0; min-height:100svh; color:var(--text); font-family:var(--mono); font-size:15px; line-height:1.7;
+    background: linear-gradient(180deg, rgba(55,166,248,.09), transparent 36%), var(--bg); position:relative; isolation:isolate; -webkit-font-smoothing:antialiased; }
+  body::before { content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size:56px 56px; opacity:.35; -webkit-mask-image:radial-gradient(closest-side,#000000bf,#0000 78%); mask-image:radial-gradient(closest-side,#000000bf,#0000 78%); }
+  a { color:inherit; text-decoration:none; }
+  ::selection { background:rgba(55,166,248,.28); color:#fff; }
+  a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  .shell { max-width:46rem; margin:0 auto; padding:0 clamp(1.25rem,4vw,2rem); }
+  .topnav { position:sticky; top:0; z-index:40; background:color-mix(in oklab, var(--bg) 80%, transparent); backdrop-filter:blur(9px) saturate(1.1); border-bottom:1px solid var(--border-2); }
+  .topnav .row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-block:.85rem; max-width:46rem; margin:0 auto; padding-inline:clamp(1.25rem,4vw,2rem); }
+  .dots { display:inline-flex; gap:.42rem; margin-right:.2rem; } .dots i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .dots i:nth-child(1){background:var(--hot);} .dots i:nth-child(2){background:var(--warm);} .dots i:nth-child(3){background:var(--cool);}
+  .brand { display:inline-flex; align-items:center; gap:.7rem; color:var(--muter); font-size:.8rem; } .brand b { color:var(--text); font-weight:400; }
+  .menu { display:flex; gap:1.3rem; } .menu a { color:var(--muter); font-size:.76rem; letter-spacing:.03em; text-transform:lowercase; border-bottom:1px solid transparent; padding-bottom:2px; transition:color .15s, border-color .15s; } .menu a:hover { color:var(--accent); border-color:rgba(55,166,248,.5); }
+  .post-head { padding-top:clamp(2.5rem,7vw,5rem); padding-bottom:1.5rem; }
+  .kicker { display:inline-flex; align-items:center; gap:.55rem; font-size:.74rem; color:var(--accent); letter-spacing:.04em; border:1px solid rgba(55,166,248,.3); background:rgba(55,166,248,.07); padding:.3rem .65rem; margin-bottom:1.4rem; }
+  h1 { font-weight:800; font-size:clamp(1.9rem,1.2rem+3vw,3.1rem); line-height:1.1; letter-spacing:-.02em; margin:0 0 1rem; text-shadow:var(--halo); }
+  .meta { color:var(--muter); font-size:.82rem; letter-spacing:.02em; } .meta .dot { color:var(--border); margin:0 .5rem; }
+  article { padding-bottom:4rem; }
+  article p { color:var(--text); margin:1.1rem 0; }
+  article h2 { font-weight:700; font-size:1.45rem; margin:2.6rem 0 .8rem; letter-spacing:-.01em; }
+  article h2::before { content:"## "; color:var(--accent); }
+  article .lead { font-size:1.08rem; color:var(--muted); }
+  code { background:#00000073; border:1px solid rgba(255,255,255,.15); padding:.1rem .4rem; font-size:.88em; color:#f3f6fff2; }
+  figure { margin:2rem 0; }
+  figure svg { width:100%; height:auto; display:block; background:var(--panel); border:1px solid var(--border); }
+  figcaption { color:var(--muter); font-size:.76rem; margin-top:.55rem; text-align:center; }
+  .d-label { font-family:var(--mono); fill:var(--text); font-size:13px; }
+  .d-mut { fill:var(--muter); font-size:12px; }
+  .d-box { fill:var(--panel-2); stroke:var(--border); }
+  .d-box-acc { fill:rgba(55,166,248,.10); stroke:var(--accent); }
+  .d-box-amb { fill:rgba(246,193,119,.10); stroke:var(--accent-2); }
+  .d-arrow { stroke:var(--accent); stroke-width:1.5; fill:none; }
+  .ledger { width:100%; border-collapse:collapse; margin:1.6rem 0; font-size:.82rem; }
+  .ledger caption { caption-side:bottom; color:var(--muter); font-size:.76rem; margin-top:.5rem; text-align:left; }
+  .ledger th, .ledger td { border:1px solid var(--border-2); padding:.5rem .6rem; text-align:left; }
+  .ledger th { color:var(--muter); font-weight:600; }
+  .ledger td.acc { color:var(--accent); font-variant-numeric:tabular-nums; }
+  footer { border-top:1px solid var(--border-2); padding:2rem 0 4rem; color:var(--muter); font-size:.82rem; display:flex; gap:1.4rem; flex-wrap:wrap; }
+  footer a { color:var(--accent-2); border-bottom:1px solid rgba(246,193,119,.4); padding-bottom:1px; } footer a:hover { color:#ffd89b; }
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="row">
+    <span class="brand"><span class="dots"><i></i><i></i><i></i></span><span>~/<b>leonardo-meireles</b> · blog</span></span>
+    <nav class="menu"><a href="/">home</a><a href="/blog/">blog</a><a href="https://github.com/leonardo-meireles/laeleficator" target="_blank" rel="noopener">source ↗</a></nav>
+  </div>
+</div>
+
+<main class="shell">
+  <header class="post-head">
+    <span class="kicker">· fine-tuning</span>
+    <h1>My model still doesn't get the joke</h1>
+    <div class="meta">August 14, 2026 <span class="dot">·</span> 6 min read <span class="dot">·</span> the laeleficator project</div>
+  </header>
+
+  <article>
+    <p class="lead">In Brazil, when someone says something innocent that also carries a second, riskier meaning, whoever catches it says "lá ele": that's on you, not me. Laeleficator is a small language model I'm fine-tuning to rewrite plain sentences so they earn that reaction. Two months in, it mostly fails. This is the honest write-up, not the highlight reel.</p>
+
+    <h2>what it's supposed to do</h2>
+    <p>You give it a harmless sentence. It hands back a version that still reads as harmless on the surface, but that a Brazilian ear catches instantly. "Você faz vitamina? Me faz uma com mamão?" becomes "Você bate uma vitamina de mamão pra mim? 👀". Same request, same words in spirit, one small shift that changes what the sentence means. The gap between too explicit and too subtle is narrow, and that gap is the entire task.</p>
+
+    <h2>an agent builds the dataset, I never touch it</h2>
+    <p>Nobody hand-labels this data. A Claude Workflow runs five stages of subagents in sequence: scrape or seed candidate phrases, vet each one on three dimensions (is it actually a double entendre, does it read as natural Brazilian Portuguese, is it subtle enough), build the input/output pair, generate two or three context variants per pair, then run an adversarial multi-judge pass that drops anything where the output isn't clearly more charged than the input. What survives becomes <code>data/final/dataset.jsonl</code>, currently 199 curated pairs.</p>
+
+    <figure>
+      <svg viewBox="0 0 720 150" role="img" aria-label="Five pipeline stages in sequence: scrape or seed, vet, pair, augment, adversarial curate, producing the final dataset. No manual review step exists.">
+        <rect x="10" y="55" width="110" height="40" class="d-box-acc"/><text x="65" y="80" text-anchor="middle" class="d-label">scrape / seed</text>
+        <path d="M120 75 L150 75" class="d-arrow" marker-end="url(#p)"/>
+        <rect x="152" y="55" width="90" height="40" class="d-box"/><text x="197" y="80" text-anchor="middle" class="d-label">vet</text>
+        <path d="M242 75 L272 75" class="d-arrow" marker-end="url(#p)"/>
+        <rect x="274" y="55" width="90" height="40" class="d-box"/><text x="319" y="80" text-anchor="middle" class="d-label">pair</text>
+        <path d="M364 75 L394 75" class="d-arrow" marker-end="url(#p)"/>
+        <rect x="396" y="55" width="110" height="40" class="d-box"/><text x="451" y="80" text-anchor="middle" class="d-label">augment</text>
+        <path d="M506 75 L536 75" class="d-arrow" marker-end="url(#p)"/>
+        <rect x="538" y="55" width="172" height="40" class="d-box-amb"/><text x="624" y="80" text-anchor="middle" class="d-label">adversarial curate</text>
+        <text x="360" y="130" text-anchor="middle" class="d-mut">no manual review step exists between these five</text>
+        <defs><marker id="p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#37a6f8"/></marker></defs>
+      </svg>
+      <figcaption>The whole dataset pipeline. I write the prompts and read the output. I don't label a single row.</figcaption>
+    </figure>
+
+    <h2>an agent runs the research loop too</h2>
+    <p>Training is local: MLX-LM, LoRA, on my M1 Max, no cloud GPU. But I'm not hand-tuning hyperparameters either. I wrote a research program modeled on Karpathy's autoresearch idea: an agent proposes one change per iteration, either to the data, the base model, or a LoRA setting, trains, evaluates against a held-out set, and keeps the change only if the metric improves. Every run gets a row in a ledger, so the history is a log I can actually read back.</p>
+    <p>The eval itself is an LLM-as-judge panel that has to unanimously agree across three lenses: charge (is it actually charged enough), explicit guard (did it go too far), and coherence (is the Portuguese even readable). The panel has only gotten stricter over time, on purpose, so a lower score later doesn't mean the model regressed. It means the bar moved.</p>
+
+    <h2>the honest number</h2>
+    <p>Best result logged so far is <b>17.6%</b>: the model clears that strict three-judge panel on 17.6% of held-out test cases. The run that produced it hit a session limit partway through eval, and every call that never completed auto-counted as a fail, so the real number is probably higher. I'm reporting the floor anyway.</p>
+    <table class="ledger">
+      <caption>a slice of the actual ledger, not cherry-picked to look better</caption>
+      <thead><tr><th>run</th><th>base model</th><th>train pairs</th><th>accuracy</th><th>what changed</th></tr></thead>
+      <tbody>
+        <tr><td>v1</td><td>Qwen2.5-1.5B</td><td>128</td><td class="acc">37.5%</td><td>first pass, easier judge, garbled Portuguese from an LR too high for the data size</td></tr>
+        <tr><td>v3</td><td>Qwen2.5-3B</td><td>345</td><td class="acc">15.9%</td><td>moved to 3B, judge hardened to unanimous three-lens, score dropped because the bar rose</td></tr>
+        <tr><td>v4</td><td>Qwen2.5-3B</td><td>400</td><td class="acc">17.6%</td><td>LoRA scale 20 → 2, rank 8 → 16, more layers, more data</td></tr>
+      </tbody>
+    </table>
+    <p>The move from 1.5B to 3B wasn't in the original plan. The 1.5B base kept garbling Portuguese under LoRA, and the 3B base held together once the LoRA scale came down from MLX's default of 20 to 2, which the fine-tuning-expert skill flagged as too aggressive for a task this narrow. Coherence is fixed now. What's still failing is charge: the model plays it safe and mostly echoes the input back with barely a shift, which is the opposite failure of a joke that's too explicit but just as much of a miss.</p>
+
+    <h2>why I'm shipping this before it works</h2>
+    <p>Every other project on this site is either live or clearly finished. This one isn't, and I think that's worth showing too. The interesting part was never going to be the final accuracy number. It's that an agent curates the data, another runs the research loop, and I spend my time reading ledgers and deciding what to try next instead of writing training scripts by hand. The model still doesn't get the joke. The pipeline that's trying to teach it does most of the work on its own, and I'm not done pushing on it.</p>
+    <p>Source and the full ledger are on <a href="https://github.com/leonardo-meireles/laeleficator" style="color:var(--accent-2);border-bottom:1px solid rgba(246,193,119,.4)" target="_blank" rel="noopener">github.com/leonardo-meireles/laeleficator</a>.</p>
+  </article>
+
+  <footer>
+    <a href="/blog/">← all posts</a>
+    <a href="/">leonardo-meireles.github.io</a>
+    <a href="https://github.com/leonardo-meireles/laeleficator" target="_blank" rel="noopener">github</a>
+  </footer>
+</main>
+
+</body>
+</html>
