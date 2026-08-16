@@ -6,13 +6,20 @@
   /* ---- rail toggle ---- */
   const rail = document.getElementById('rail');
   const tbToggle = document.getElementById('tb-toggle');
-  if (tbToggle && rail) {
-    tbToggle.addEventListener('click', () => {
-      const open = rail.getAttribute('data-open') !== 'false';
-      rail.setAttribute('data-open', String(!open));
-      tbToggle.setAttribute('aria-expanded', String(!open));
-    });
+  const scrim = document.querySelector('.rail-scrim');
+  function setRail(open) {
+    if (!rail) return;
+    rail.setAttribute('data-open', String(open));
+    if (tbToggle) tbToggle.setAttribute('aria-expanded', String(open));
+    if (open && matchMedia('(max-width: 900px)').matches) document.body.classList.add('rail-open');
+    else document.body.classList.remove('rail-open');
   }
+  if (tbToggle && rail) {
+    tbToggle.addEventListener('click', () => setRail(rail.getAttribute('data-open') !== 'true'));
+  }
+  if (scrim) scrim.addEventListener('click', () => setRail(false));
+  // start with the drawer closed on mobile; open by default on desktop
+  if (matchMedia('(max-width: 900px)').matches) setRail(false);
 
   /* ---- reveal on scroll ---- */
   const rv = document.querySelectorAll('.rv');

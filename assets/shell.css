@@ -42,7 +42,6 @@ img, canvas { image-rendering: pixelated; }
 .shell-app {
   display: flex;
   min-height: 100vh;
-  min-width: var(--shell-min);
   background: var(--paper);
 }
 
@@ -58,16 +57,13 @@ img, canvas { image-rendering: pixelated; }
   padding: 24px 20px 18px;
   border-bottom: 1px solid var(--line);
 }
-.rail .rail-brand .wordmark {
-  font: var(--display-weight) 34px/0.88 var(--font-display);
-  letter-spacing: -0.012em; text-transform: lowercase;
-  white-space: nowrap; color: var(--ink);
+.rail .rail-brand .rb-brand {
+  display: flex; align-items: center; gap: .6rem;
+  font: var(--mono-row); color: var(--ink-body);
+  white-space: nowrap;
 }
-.rail .rail-brand .state {
-  display: flex; align-items: center; gap: 7px; margin-top: 10px;
-  font: var(--mono-label); font-size: 9px; letter-spacing: 0.14em; white-space: nowrap;
-  color: var(--signal-ok);
-}
+.rail .rail-brand .rb-brand b { color: var(--ink); font-weight: 700; }
+.rail .rail-brand .rb-brand .bsub { color: var(--ink-disabled); }
 .rail .rail-nav {
   flex: 1; overflow-y: auto; overflow-x: hidden;
   padding: 14px 10px;
@@ -275,10 +271,23 @@ img, canvas { image-rendering: pixelated; }
 #signal {
   position: absolute; inset: 0; width: 100%; height: 100%;
   z-index: 0; pointer-events: none; display: block; image-rendering: pixelated;
+  opacity: 0.38;
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 78%, transparent 100%);
   mask-image: linear-gradient(180deg, #000 0%, #000 78%, transparent 100%);
 }
 .hero-canvas-wrap > * { position: relative; z-index: 1; }
+
+/* solid paper block behind the hero copy so text clearly pops over the
+   live ink canvas; the canvas remains as a living frame around it */
+.hero-canvas-wrap .page-inner { position: relative; }
+.hero-canvas-wrap .page-inner::before {
+  content: ""; position: absolute; inset: -24px -60px -60px;
+  z-index: -1;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper) 78%, transparent 100%);
+}
+
+/* pixel dot — shared brand mark (rail + anywhere) */
+.pxdot { width: 11px; height: 11px; background: var(--px-blue); box-shadow: 3px 3px 0 0 var(--px-ink); flex: none; display: inline-block; }
 
 /* ============================================================
    Content building blocks (shared across pages)
@@ -449,9 +458,9 @@ footer .f-links { display: flex; gap: 1.2rem; }
 #ytwrap { position: fixed; left: -9999px; top: 0; width: 320px; height: 180px; overflow: hidden; }
 
 /* reveal */
-.rv { opacity: 0; transform: translateY(14px); transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1); }
-.rv.in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } }
+html.js .rv { opacity: 0; transform: translateY(14px); transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1); }
+html.js .rv.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { html.js .rv { opacity: 1; transform: none; transition: none; } }
 
 /* blog article typography */
 .article-body { max-width: 46rem; }
@@ -486,3 +495,37 @@ footer .f-links { display: flex; gap: 1.2rem; }
 .d-arrow { stroke: var(--accent); stroke-width: 1.5; fill: none; }
 .d-arrow-mut { stroke: var(--ink-disabled); stroke-width: 1.2; fill: none; opacity: .5; }
 .d-faint { opacity: .45; }
+
+/* ============================================================
+   Responsive: rail becomes an off-canvas drawer on narrow screens
+   ============================================================ */
+@media (max-width: 900px) {
+  .rail {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    height: 100dvh; z-index: 90;
+    transform: translateX(-100%);
+    transition: transform var(--dur-rail) var(--ease);
+    border-right: 1px solid var(--ink);
+    box-shadow: 12px 0 30px rgba(18,20,26,.12);
+  }
+  .rail[data-open="true"] { transform: translateX(0); }
+  .main-col { min-width: 0; }
+
+  /* larger touch targets for the primary controls on touch screens */
+  .tb-toggle { width: 44px; height: 44px; }
+  .nav-item { padding: 12px 10px; }
+  .radio .r-play { width: 40px; height: 40px; }
+
+  /* scrim behind the open rail */
+  .rail-scrim {
+    position: fixed; inset: 0; z-index: 89;
+    background: color-mix(in oklab, var(--ink) 28%, transparent);
+    opacity: 0; pointer-events: none; transition: opacity var(--dur-rail) var(--ease);
+  }
+  .rail[data-open="true"] ~ .main-col .rail-scrim,
+  .rail[data-open="true"] + .main-col .rail-scrim { opacity: 1; pointer-events: auto; }
+  body.rail-open { overflow: hidden; }
+}
+@media (min-width: 901px) {
+  .rail-scrim { display: none; }
+}
