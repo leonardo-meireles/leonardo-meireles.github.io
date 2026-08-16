@@ -1,0 +1,181 @@
+/* Design tokens — OP-1 Wizard for Mac companion.
+   Distilled from the Claude Design project (docs/design-system.md).
+   See docs/design-system.md for rationale; keep in sync. */
+
+/* Fonts are self-hosted variable woff2 (one file per family covers every
+   weight). The Google-hosted @import has been replaced with @font-face rules
+   pointing at bundled copies in ./fonts. */
+@font-face {
+  font-family: "Big Shoulders Display";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/big-shoulders-display-variable.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/archivo-variable.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Martian Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/martian-mono-variable.woff2") format("woff2-variations");
+}
+
+
+:root {
+  /* Paper — warm bone greys. Hue 75 throughout; nothing here is neutral grey. */
+  --paper: oklch(0.976 0.006 75);
+  --surface-card: oklch(0.968 0.007 75);
+  --surface-rail: oklch(0.955 0.008 75);
+  --surface-sunk: oklch(0.930 0.010 75);
+
+  /* Ink */
+  --ink: oklch(0.150 0.009 75);
+  --ink-strong: oklch(0.360 0.012 75);
+  --ink-body: oklch(0.512 0.014 75);
+  --ink-disabled: oklch(0.640 0.012 75);
+  --ink-inverse: oklch(0.976 0.006 75);
+  --ink-inverse-dim: oklch(0.800 0.010 75);
+
+  /* Lines */
+  --line: oklch(0.870 0.012 75);
+  --line-soft: oklch(0.925 0.010 75);
+  --line-faint: oklch(0.780 0.013 75);
+
+  /* Accent — PostHog blue. accent-text clears 4.5:1 on --paper. */
+  --accent: oklch(0.520 0.240 264);
+  --accent-text: oklch(0.455 0.225 264);
+  --accent-wash: oklch(0.520 0.240 264 / 0.06);
+  --accent-tint: oklch(0.520 0.240 264 / 0.12);
+
+  /* Signals. Green = connected / kept / done — never decoration. */
+  --signal-ok: oklch(0.470 0.110 152);
+  --signal-ok-bright: oklch(0.635 0.150 152);
+  --signal-warn: #F9BD2B;
+  --signal-hot: #F54E00;
+
+  /* Pixel-art palette — the exact 12 values every sprite and the canvas
+     tape machine are drawn from. Do not add to this list. */
+  --px-ink: #212532;
+  --px-slate: #4E5877;
+  --px-grey: #898E9E;
+  --px-light: #CDD1DF;
+  --px-panel: #E0E2E8;
+  --px-white: #FFFFFF;
+  --px-off: #FCFCFC;
+  --px-blue: #1D4AFF;
+  --px-green: #02B881;
+  --px-yellow: #F9BD2B;
+  --px-orange: #F54E00;
+  --px-screen: #161A26;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 10px;
+  --space-4: 14px;
+  --space-5: 18px;
+  --space-6: 22px;
+  --space-7: 26px;
+  --space-8: 30px;
+  --space-9: 40px;
+
+  /* Structure */
+  --page-pad-x: 40px;
+  --page-pad-top: 32px;
+  --rail-width: 232px;
+  --inspector-width: 336px;
+  --titlebar-height: 48px;
+  --shell-min-width: 1180px;
+
+  /* Radii — the system is square. Pills and circles are the only curves. */
+  --radius-none: 0px;
+  --radius-row: 6px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  /* Surfaces — no shadows; depth is a 1px line + half-step of paper. */
+  --border-hair: 1px solid var(--line);
+  --border-soft: 1px solid var(--line-soft);
+  --border-strong: 1px solid var(--ink);
+  --border-accent: 1px solid var(--accent);
+  --border-dashed: 2px dashed var(--line-faint);
+  --rule-dashed: repeating-linear-gradient(90deg, var(--line-faint) 0 5px, transparent 5px 11px);
+  --rule-dashed-soft: repeating-linear-gradient(90deg, oklch(0.820 0.012 75) 0 4px, transparent 4px 9px);
+  --pixel-rendering: pixelated;
+  --hover-lift: translateY(-2px);
+  --press-scale: scale(0.96);
+
+  /* Type */
+  --font-display: "Big Shoulders Display", sans-serif;
+  --font-body: Archivo, sans-serif;
+  --font-mono: "Martian Mono", monospace;
+  --display-weight: 800;
+  --page-title: var(--display-weight) 118px/0.79 var(--font-display);
+  --page-title-tracking: -0.022em;
+  --display-lg: var(--display-weight) 54px/0.9 var(--font-display);
+  --display-md: var(--display-weight) 34px/0.92 var(--font-display);
+  --display-sm: var(--display-weight) 27px/1 var(--font-display);
+  --body: 400 14.5px/1.5 var(--font-body);
+  --body-sm: 400 13.5px/1.6 var(--font-body);
+  --body-xs: 400 12.5px/1.5 var(--font-body);
+  --mono-row: 400 12px/1.5 var(--font-mono);
+  --mono-meta: 400 10px/1.7 var(--font-mono);
+  --mono-label: 400 9px/1 var(--font-mono);
+  --mono-label-tracking: 0.2em;
+  --mono-button-tracking: 0.12em;
+  --readout: 300 34px/1 var(--font-mono);
+
+  /* Motion */
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-linear: linear;
+  --dur-press: 130ms;
+  --dur-hover: 170ms;
+  --dur-toggle: 220ms;
+  --dur-enter: 260ms;
+  --dur-row: 380ms;
+  --dur-page: 360ms;
+  --dur-rail: 280ms;
+  --stagger-row: 45ms;
+}
+
+@keyframes ds-rowin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes ds-pagein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes ds-slidein { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes ds-dockin { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: none; } }
+@keyframes ds-blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0.18; } }
+@keyframes ds-reel { to { transform: rotate(360deg); } }
+@keyframes ds-pulse { 0%, 100% { transform: scale(1); opacity: 0.85; } 50% { transform: scale(1.7); opacity: 0; } }
+@keyframes ds-marquee { to { transform: translateX(-50%); } }
+@keyframes scanline { from { top: 34px; } to { top: 82px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button { font-family: inherit; }
+
+canvas { image-rendering: pixelated; }

@@ -5,79 +5,123 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Blog · Leonardo Meireles</title>
 <meta name="description" content="Notes on backend, distributed systems, AI platforms, and building things with coding agents." />
-<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22&gt;&lt;rect width=%2232%22 height=%2232%22 fill=%22%230b0e12%22/&gt;&lt;path d=%22M3 17h5l2-7 4 13 3-9 2 4h10%22 fill=%22none%22 stroke=%22%2337a6f8%22 stroke-width=%222%22 stroke-linejoin=%22round%22 stroke-linecap=%22round%22/&gt;&lt;/svg&gt;" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+<link rel="stylesheet" href="../assets/tokens.css" />
+<link rel="stylesheet" href="../assets/shell.css" />
 <style>
-  :root {
-    --bg:#0b0e12; --panel:#0f141b; --panel-2:#0c1016;
-    --border:rgba(222,232,255,.14); --border-2:rgba(222,232,255,.09);
-    --text:rgba(243,246,255,.92); --muted:rgba(243,246,255,.68); --muter:rgba(243,246,255,.52);
-    --accent:#37a6f8; --accent-2:#f6c177; --hot:#ff5b57; --warm:#febc2e; --cool:#28c840;
-    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-    color-scheme: dark;
-    --halo: 0 0 1px #000, 0 0 2px #000, 0 0 3px #000, 0 0 4px #000, 0 0 6px #050709, 0 0 12px #050709, 0 0 18px #050709;
-  }
-  * { box-sizing:border-box; }
-  body { margin:0; min-height:100svh; color:var(--text); font-family:var(--mono); font-size:15px; line-height:1.7;
-    background: linear-gradient(180deg, rgba(55,166,248,.09), transparent 36%), var(--bg); position:relative; isolation:isolate; -webkit-font-smoothing:antialiased; }
-  body::before { content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-    background-size:56px 56px; opacity:.35; -webkit-mask-image:radial-gradient(closest-side,#000000bf,#0000 78%); mask-image:radial-gradient(closest-side,#000000bf,#0000 78%); }
-  a { color:inherit; text-decoration:none; }
-  .shell { max-width:46rem; margin:0 auto; padding:0 clamp(1.25rem,4vw,2rem); }
-  .topnav { position:sticky; top:0; z-index:40; background:color-mix(in oklab, var(--bg) 80%, transparent); backdrop-filter:blur(9px); border-bottom:1px solid var(--border-2); }
-  .topnav .row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-block:.85rem; max-width:46rem; margin:0 auto; padding-inline:clamp(1.25rem,4vw,2rem); }
-  .dots { display:inline-flex; gap:.42rem; } .dots i { width:11px; height:11px; border-radius:50%; display:inline-block; }
-  .dots i:nth-child(1){background:var(--hot);} .dots i:nth-child(2){background:var(--warm);} .dots i:nth-child(3){background:var(--cool);}
-  .brand { display:inline-flex; align-items:center; gap:.7rem; color:var(--muter); font-size:.8rem; } .brand b { color:var(--text); font-weight:400; }
-  .menu { display:flex; gap:1.3rem; } .menu a { color:var(--muter); font-size:.76rem; text-transform:lowercase; border-bottom:1px solid transparent; padding-bottom:2px; } .menu a:hover { color:var(--accent); border-color:rgba(55,166,248,.5); }
-  h1 { font-weight:800; font-size:clamp(2rem,1.3rem+3vw,3rem); letter-spacing:-.02em; margin:clamp(2.5rem,7vw,5rem) 0 .4rem; text-shadow:var(--halo); }
-  .sub { color:var(--muter); margin:0 0 2.5rem; }
-  .post { display:block; border:1px solid var(--border); background:var(--panel); padding:1.3rem 1.4rem; margin-bottom:1.1rem; transition:border-color .15s, transform .15s; }
-  .post:hover { border-color:var(--accent); transform:translateY(-2px); }
-  .post .tag { color:var(--accent); font-size:.72rem; letter-spacing:.04em; }
-  .post h2 { font-weight:700; font-size:1.25rem; margin:.5rem 0 .4rem; }
-  .post p { color:var(--muted); margin:0 0 .6rem; font-size:.92rem; }
-  .post .m { color:var(--muter); font-size:.76rem; }
-  footer { border-top:1px solid var(--border-2); padding:2rem 0 4rem; margin-top:2rem; color:var(--muter); font-size:.82rem; }
-  footer a { color:var(--accent-2); border-bottom:1px solid rgba(246,193,119,.4); }
+  /* blog-specific tweaks */
+  .pg-head h1 { margin-top: 10px; }
+  .grid-blog { display: grid; grid-template-columns: 1fr; gap: 1.1rem; }
+  @media (min-width: 720px) { .grid-blog { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.2rem; } }
 </style>
 </head>
 <body>
-<div class="topnav">
-  <div class="row">
-    <span class="brand"><span class="dots"><i></i><i></i><i></i></span><span>~/<b>leonardo-meireles</b> · blog</span></span>
-    <nav class="menu"><a href="/">home</a><a href="https://github.com/leonardo-meireles" target="_blank" rel="noopener">github ↗</a></nav>
+
+<div class="shell-app">
+  <aside class="rail" id="rail" aria-label="Library" data-open="true">
+    <div class="rail-brand">
+      <div class="wordmark">leo meireles</div>
+      <div class="state"><span class="dot ok"><i></i></span><span>[online]</span></div>
+    </div>
+    <nav class="rail-nav" aria-label="Destinations">
+      <div class="nav-group">
+        <div class="ng-label"><span>[primary]</span><i></i></div>
+        <a class="nav-item" href="../">
+          <span class="ni-bar"></span>
+          <span class="ni-icon"><span class="px" style="width:16px;height:16px;background-image:url(../assets/sprites/nav-home.png)"></span></span>
+          <span class="ni-label">home</span>
+        </a>
+        <a class="nav-item active" href="../#blog" aria-current="page">
+          <span class="ni-bar"></span>
+          <span class="ni-icon"><span class="px" style="width:16px;height:16px;background-image:url(../assets/sprites/nav-blog.png)"></span></span>
+          <span class="ni-label">writing</span>
+          <span class="ni-badge ok">03</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <div class="ng-label"><span>[content]</span><i></i></div>
+        <a class="nav-item" href="../#resume">
+          <span class="ni-bar"></span>
+          <span class="ni-icon"><span class="px" style="width:16px;height:16px;background-image:url(../assets/sprites/nav-resume.png)"></span></span>
+          <span class="ni-label">resume</span>
+        </a>
+        <a class="nav-item" href="../#cases">
+          <span class="ni-bar"></span>
+          <span class="ni-icon"><span class="px" style="width:16px;height:16px;background-image:url(../assets/sprites/nav-cases.png)"></span></span>
+          <span class="ni-label">cases</span>
+        </a>
+      </div>
+    </nav>
+    <div class="rail-footer">
+      <div class="rf-row"><span>status</span><b>ok</b></div>
+      <div class="rf-meter"><i style="width:100%"></i></div>
+      <div class="rf-row"><span>version</span><b>2.0.0</b></div>
+    </div>
+  </aside>
+
+  <div class="main-col">
+    <header class="titlebar">
+      <button class="tb-toggle" aria-label="Toggle sidebar"><span class="hamb" aria-hidden="true"><i></i></span></button>
+      <div class="tb-crumb"><b>leo</b><span aria-hidden="true">/</span>content · writing</div>
+      <a class="tb-connect on" href="../">
+        <span class="dot ok pulse"><i></i></span>
+        <span class="tb-state">home</span>
+      </a>
+    </header>
+
+    <main class="main" id="main">
+      <div class="page">
+        <div class="page-inner">
+          <div class="pg-head">
+            <div class="pg-meta">
+              <span class="pg-no">Nº05</span>
+              <span class="pg-kicker">content · writing</span>
+              <span class="pg-rule"></span>
+            </div>
+            <h1>blog</h1>
+            <p class="pg-blurb">Notes on backend, distributed systems, AI platforms, and building with coding agents.</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="grid-blog">
+            <a class="pcard rv" href="/blog/laeleficator/">
+              <div class="card-top" style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+                <h3>My model still doesn't get the joke</h3>
+                <span class="tag accent">fine-tuning</span>
+              </div>
+              <p class="desc">Agents curate the dataset, agents run the research loop, and the model still fails a strict judge panel most of the time. Notes from the honest, unglamorous middle of a fine-tune.</p>
+              <div class="tags"><span>Qwen2.5</span><span>MLX-LM</span><span>LoRA</span><span>agentic coding</span></div>
+              <span class="pmeta">August 14, 2026 · 6 min read</span>
+            </a>
+            <a class="pcard rv" href="/blog/creative-coding-with-claude-code/">
+              <div class="card-top" style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+                <h3>How I make coding with Claude Code fun</h3>
+                <span class="tag accent">creative coding</span>
+              </div>
+              <p class="desc">I always wanted to build generative art but kept hitting a frontend wall. How music theory, Rust, an LLM, and a loose back-and-forth with an agent became void, a canvas that draws and scores itself.</p>
+              <div class="tags"><span>Rust</span><span>WASM</span><span>Web Audio</span><span>LLM</span><span>generative art</span></div>
+              <span class="pmeta">June 16, 2026 · 8 min read</span>
+            </a>
+            <a class="pcard rv" href="/blog/perfect-is-contextual/">
+              <div class="card-top" style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+                <h3>The cleanest design was the wrong one</h3>
+                <span class="tag accent">distributed systems</span>
+              </div>
+              <p class="desc">Why I shipped polling instead of a push-based design for a platform many teams self-deploy, and the cold-start hot-partition trap an agent-coding session caught that I'd waved off.</p>
+              <div class="tags"><span>Go</span><span>distributed systems</span><span>sharding</span><span>agentic coding</span></div>
+              <span class="pmeta">June 16, 2026 · 7 min read</span>
+            </a>
+          </div>
+        </div>
+        <footer>
+          <span>B.Sc. Computer Science, USP · São Carlos, Brazil</span>
+          <div class="f-links"><a href="../">← back to leonardo-meireles.github.io</a></div>
+        </footer>
+      </div>
+    </main>
   </div>
 </div>
-<main class="shell">
-  <h1>blog</h1>
-  <p class="sub">Notes on backend, distributed systems, AI platforms, and building with coding agents.</p>
 
-  <a class="post" href="/blog/laeleficator/">
-    <span class="tag">· fine-tuning</span>
-    <h2>My model still doesn't get the joke</h2>
-    <p>Agents curate the dataset, agents run the research loop, and the model still fails a strict judge panel most of the time. Notes from the honest, unglamorous middle of a fine-tune.</p>
-    <span class="m">August 14, 2026 · 6 min read</span>
-  </a>
-
-  <a class="post" href="/blog/creative-coding-with-claude-code/">
-    <span class="tag">· creative coding</span>
-    <h2>How I make coding with Claude Code fun</h2>
-    <p>I always wanted to build generative art but kept hitting a frontend wall. How music theory, Rust, an LLM, and a loose back-and-forth with an agent became void, a canvas that draws and scores itself.</p>
-    <span class="m">June 16, 2026 · 8 min read</span>
-  </a>
-
-  <a class="post" href="/blog/perfect-is-contextual/">
-    <span class="tag">· distributed systems</span>
-    <h2>The cleanest design was the wrong one</h2>
-    <p>Why I shipped polling instead of a push-based design for a platform many teams self-deploy, and the cold-start hot-partition trap an agent-coding session caught that I'd waved off.</p>
-    <span class="m">June 16, 2026 · 7 min read</span>
-  </a>
-
-  <footer><a href="/">← back to leonardo-meireles.github.io</a></footer>
-</main>
+<script src="../assets/shell.js"></script>
 </body>
 </html>
